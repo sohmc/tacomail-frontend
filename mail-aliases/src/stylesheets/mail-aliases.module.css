@@ -1,0 +1,118 @@
+/* @import './alias_table.css'; */
+
+/* Site Styles */
+div#results_container {
+    width: 75%;
+    margin: 30px auto 0;
+}
+
+.css_right {
+    float: right;
+    display: inline-block;
+}
+
+
+/* Interface styles */
+
+.status_box {
+    margin: 10px auto;
+    width: 75%;
+    padding: 0 0.7em;
+}
+
+#workspace {
+    width: 450px;
+    height: 300px;
+    display: none;
+}
+
+#version {
+    right: 0px;
+    bottom: 0px;
+    position: absolute;
+    font-size: 50%;
+}
+
+.textbox {
+    width: 300px;
+    background-color: red;
+}
+
+.submitButton {
+    border: 1px solid black;
+}
+
+.hidden {
+    left: -1000px;
+    display: none;
+}
+
+.show {
+    left: 0px;
+    display: block;
+}
+
+li.nolist {
+    list-style: none outside none;
+    float: left;
+    margin: 2px;
+    padding: 4px 0;
+    width: 24px;
+}
+
+#random_str_container {
+    background-color: #CCFF99;
+    z-index: 100;
+    margin: 0px auto 0px auto;
+    width: 400px;
+    padding: 5px;
+    display: none;
+}
+
+#reload_icon {
+    height: 25px;
+    width: 25px;
+    right: 0px;
+    bottom: 0px;
+    cursor: pointer;
+    float: right;
+}
+
+
+table#email_alias_table {
+    width: 100%;
+}
+
+
+/* HELP styles */
+
+#help_container {
+    width: 250px;
+    height: 650px;
+    left: -500px;
+    position: absolute;
+    top: 0px;
+}
+
+#help {
+    padding: 10px;
+    background-color: #CCFFFF;
+    z-index: 100;
+}
+
+#help_icon {
+    left: 0px;
+    cursor: pointer;
+}
+
+span.command {
+    font-style: bold;
+    font-family: courier;
+}
+
+span.parameter {
+     font-style: italic;
+     font-family: courier;
+     color: blue;
+}
+
