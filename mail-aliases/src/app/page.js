@@ -1,31 +1,39 @@
 "use client";
 
-import mailAliasesStyle from '../stylesheets/mail-aliases.module.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import Button from 'react-bootstrap/Button';
 import { useState } from 'react';
+
+import mailAliasesStyle from '../stylesheets/mail-aliases.module.css';
 
 
 export default function FirstPost() {
   const [query, setQuery] = useState('');
   const [error, setError] = useState(null);
-  const [resultsArray, setRestultsArray] = useState(null);
+  const [results, setResults] = useState(null);
 
-  function sendQuery(q) {
+  async function sendQuery(q) {
     q.preventDefault();
 
     const form = q.target;
-    const formData = new FormData(form)
+    const formData = new FormData(q.target)
     const formJson = Object.fromEntries(formData.entries());
 
-    console.log(JSON.stringify(formJson));
+    const fetchResults = await fetch('/api', {
+      method: 'GET'
+    });
+    
+    const fetchResultsJson = await fetchResults.json();
+    setResults(fetchResultsJson.data.uuid);
   }
 
   return (
-    <form method="post" onSubmit={sendQuery}>
+    <form onSubmit={sendQuery}>
       <h1>mikesoh.com mail aliases</h1>
-      <input type="text" name="query" defaultValue={query} className={mailAliasesStyle.textbox} />{'  '}
+      <input type="text" name="query" value={query} className={mailAliasesStyle.textbox} />{'  '}
       <Button type="submit">Execute</Button>
+      <br/>
+      <p>{results ? results : 'no results'}</p>
     </form>
   );
 }
