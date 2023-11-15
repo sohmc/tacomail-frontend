@@ -20,17 +20,17 @@ export default function FirstPost() {
     const formJson = Object.fromEntries(formData.entries());
 
     const fetchResults = await fetch('/api', {
-      method: 'GET'
+      method: 'POST'
     });
     
     const fetchResultsJson = await fetchResults.json();
-    setResults(fetchResultsJson.data.uuid);
+    setResults(JSON.stringify(fetchResultsJson));
   }
 
   return (
     <form onSubmit={sendQuery}>
       <h1>mikesoh.com mail aliases</h1>
-      <input type="text" name="query" value={query} className={mailAliasesStyle.textbox} />{'  '}
+      <input type="text" name="query" defaultValue={query} className={mailAliasesStyle.textbox} />{'  '}
       <Button type="submit">Execute</Button>
       <br/>
       <p>{results ? results : 'no results'}</p>

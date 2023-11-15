@@ -9,6 +9,8 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@aws-crypto/sha256-js": "^5.2.0",
+    "@aws-sdk/signature-v4": "^3.374.0",
     "bootstrap": "^5.3.2",
     "next": "14.0.2",
     "react": "^18",
@@ -16,6 +18,7 @@
     "react-dom": "^18"
   },
   "devDependencies": {
+    "dotenv": "^16.3.1",
     "autoprefixer": "^10.0.1",
     "eslint": "^8",
     "eslint-config-next": "14.0.2",
