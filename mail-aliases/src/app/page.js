@@ -15,13 +15,17 @@ export default function FirstPost() {
   async function sendQuery(q) {
     q.preventDefault();
 
-    const form = q.target;
     const formData = new FormData(q.target)
     const formJson = Object.fromEntries(formData.entries());
 
-    const fetchResults = await fetch('/api', {
-      method: 'POST'
-    });
+    console.log('formJson: ' + JSON.stringify(formJson));
+
+    const apiRequest = {
+      method: 'POST',
+      body: formData,
+    };
+
+    const fetchResults = await fetch('/api', apiRequest);
     
     const fetchResultsJson = await fetchResults.json();
     setResults(JSON.stringify(fetchResultsJson));

@@ -4,10 +4,11 @@ import { SignatureV4 } from '@aws-sdk/signature-v4';
 import { Sha256 } from '@aws-crypto/sha256-js';
 
 export async function POST(request) {
-  console.log('route:request -- ' + JSON.stringify(request));
+  const formData = await request.formData();
+  console.log('route:request -- ' + JSON.stringify(formData.get('query')));
   
   const baseUrl = process.env.LAMBDA_URL;
-  const endpoint = '/alias?alias=' + request;
+  const endpoint = '/alias?alias=' + formData.get('query');
   const apiUrl = new URL(endpoint, baseUrl);
 
   const sigv4 = new SignatureV4({
