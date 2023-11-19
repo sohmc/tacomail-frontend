@@ -4,13 +4,40 @@ import { SignatureV4 } from '@aws-sdk/signature-v4';
 import { Sha256 } from '@aws-crypto/sha256-js';
 
 export async function POST(request) {
+  let returnObject = {};
+
   const formData = await request.formData();
+  const queryString = formData.get('query').toLowerCase();
+
   console.log('route:request -- ' + JSON.stringify(formData.get('query')));
+
+  if (queryString.startsWith('new:')) {
+    returnObject = await createAlias(queryString.slice(3));
+  } else {
+    returnObject = await queryDatabase(queryString);
+  }
   
-  const baseUrl = process.env.LAMBDA_URL;
-  const endpoint = '/alias?alias=' + formData.get('query');
+  return Response.json(returnObject);
+}
+
+async function createAlias(newAlias) {
+  return {}
+}
+
+
+async function queryDatabase(queryString) {
+  const endpoint = '/alias?q=' + queryString;
+
+  const responseJson = await sendApiRequest('GET', endpoint);
+  return responseJson;
+}
+
+
+async function sendApiRequest(requestMethod = 'GET', endpoint, payload = {}) {
+  const baseUrl = process.env.LAMBDA_URL
   const apiUrl = new URL(endpoint, baseUrl);
 
+  // Prepare to sign the request
   const sigv4 = new SignatureV4({
     service: 'lambda',
     region: 'us-east-1',
@@ -21,15 +48,17 @@ export async function POST(request) {
     sha256: Sha256,
   });
 
+  // Check query endpoint for URL Parameters
   let canonicalQueryObject = {};
   const params = apiUrl.searchParams.toString().split('&');
   params.forEach(element => {
     const [p, v] = element.split('=');
     canonicalQueryObject[decodeURIComponent(p)] = decodeURIComponent(v);
   });
- 
+
+  // Send Signing Request
   const signed = await sigv4.sign({
-    method: 'GET',
+    method: requestMethod,
     hostname: apiUrl.host,
     path: apiUrl.pathname,
     protocol: apiUrl.protocol,
@@ -41,15 +70,14 @@ export async function POST(request) {
     },
   });
 
-  console.log('route:signed -- ' + JSON.stringify(signed));
+  console.log('route:signedRequest -- ' + JSON.stringify(signed));
 
   const fetchResults = await fetch(apiUrl.href, {
-    method: 'GET',
+    method: requestMethod,
     headers: signed.headers,
   });
-  
-  const data = await fetchResults.json();
 
-  console.log('route:data -- ' + JSON.stringify(data));
-  return Response.json(data);
+  const data = await fetchResults.json();
+  console.log('route:sendApiRequest -- ' + JSON.stringify(data));
+  return data;
 }

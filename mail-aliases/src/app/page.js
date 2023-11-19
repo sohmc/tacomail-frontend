@@ -25,10 +25,12 @@ export default function FirstPost() {
       body: formData,
     };
 
-    const fetchResults = await fetch('/api', apiRequest);
+    if (Object.prototype.hasOwnProperty.call(formJson, 'query') && formJson.query.length > 0) {
+      const fetchResults = await fetch('/api', apiRequest);
     
-    const fetchResultsJson = await fetchResults.json();
-    setResults(JSON.stringify(fetchResultsJson));
+      const fetchResultsJson = await fetchResults.json();
+      setResults(JSON.stringify(fetchResultsJson));
+    }
   }
 
   return (
