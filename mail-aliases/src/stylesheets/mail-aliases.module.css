@@ -82,9 +82,8 @@ table#email_alias_table {
     width: 100%;
 }
 
-/* Alias Styles */
-.alias-ignore {
-    
+.modalBody {
+    font-size: xx-large;
 }
 
 /* HELP styles */

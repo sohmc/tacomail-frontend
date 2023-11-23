@@ -3,16 +3,19 @@
 import 'bootstrap/dist/css/bootstrap.min.css';
 import Button from 'react-bootstrap/Button';
 import Accordion from 'react-bootstrap/Accordion';
+import Modal from 'react-bootstrap/Modal';
 import { useState } from 'react';
 
 import mailAliasesStyle from '../stylesheets/mail-aliases.module.css';
-import AccordionBody from 'react-bootstrap/esm/AccordionBody';
 
 
 export default function OpenPage() {
   const [query, setQuery] = useState('');
   const [error, setError] = useState(null);
   const [results, setResults] = useState(null);
+
+  const [showEmailModel, setShowEmailModel] = useState(false);
+  const [thisAlias, setThisAlias] = useState('');
 
   async function sendQuery(q) {
     q.preventDefault();
@@ -35,14 +38,20 @@ export default function OpenPage() {
     }
   }
 
+  const handleClose = () => setShowEmailModel(false);
+  const handleShow  = (emailAddress) => {
+    setThisAlias(emailAddress);
+    setShowEmailModel(true);
+  }
+
   let aliasList = "";
   if (results) {
-    console.log(JSON.stringify(results));
     aliasList = results.map(alias => 
       <Accordion.Item eventKey={alias.uuid}>
         <Accordion.Header>{alias.fullEmailAddress} <GetIcons ignoreFlag={alias.ignore} activeFlag={alias.active} /></Accordion.Header>
         <Accordion.Body>
-          Destination: {alias.destination}
+          <p>Destination: {alias.destination}</p>
+          <Button onClick={ () => handleShow(alias.fullEmailAddress) }>Show Email</Button>
         </Accordion.Body>
       </Accordion.Item>
     );  
@@ -55,6 +64,10 @@ export default function OpenPage() {
       <Button type="submit">Execute</Button>
       <br/>
       {results ? <Accordion>{aliasList}</Accordion> : 'no results'}
+      <Modal show={ showEmailModel } onHide={ handleClose } fullscreen="true">
+        <Modal.Header closeButton />
+        <Modal.Body className={mailAliasesStyle.modalBody}>{thisAlias}</Modal.Body>
+      </Modal>
     </form>
   );
 }
