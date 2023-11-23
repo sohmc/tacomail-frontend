@@ -1,4 +1,4 @@
-require('dotenv').config({ path: '../../.env.local'});
+require('dotenv').config({ path: '../../.env.local' });
 
 import { SignatureV4 } from '@aws-sdk/signature-v4';
 import { Sha256 } from '@aws-crypto/sha256-js';
@@ -16,12 +16,12 @@ export async function POST(request) {
   } else {
     returnObject = await queryDatabase(queryString);
   }
-  
+
   return Response.json(returnObject);
 }
 
 async function createAlias(newAlias) {
-  return {}
+  return newAlias;
 }
 
 
@@ -33,8 +33,8 @@ async function queryDatabase(queryString) {
 }
 
 
-async function sendApiRequest(requestMethod = 'GET', endpoint, payload = {}) {
-  const baseUrl = process.env.LAMBDA_URL
+async function sendApiRequest(requestMethod = 'GET', endpoint, _payload = {}) {
+  const baseUrl = process.env.LAMBDA_URL;
   const apiUrl = new URL(endpoint, baseUrl);
 
   // Prepare to sign the request
@@ -49,7 +49,7 @@ async function sendApiRequest(requestMethod = 'GET', endpoint, payload = {}) {
   });
 
   // Check query endpoint for URL Parameters
-  let canonicalQueryObject = {};
+  const canonicalQueryObject = {};
   const params = apiUrl.searchParams.toString().split('&');
   params.forEach(element => {
     const [p, v] = element.split('=');
