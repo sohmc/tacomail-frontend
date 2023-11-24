@@ -58,17 +58,19 @@ export default function OpenPage() {
   }
 
   return (
-    <form onSubmit={sendQuery}>
-      <h1>mikesoh.com mail aliases</h1>
-      <input type="text" name="query" defaultValue={query} className={mailAliasesStyle.textbox} />{'  '}
-      <Button type="submit">Execute</Button>
+    <div className={mailAliasesStyle.mainContainer}>
+      <h1 className={mailAliasesStyle.textCenter}>mikesoh.com mail aliases</h1>
+      <form onSubmit={sendQuery} className={mailAliasesStyle.textCenter}>
+        <input type="text" name="query" defaultValue={query} className={mailAliasesStyle.textbox} />{'  '}
+        <Button type="submit">Execute</Button>
+      </form>
       <br/>
       {results ? <Accordion>{aliasList}</Accordion> : 'no results'}
-      <Modal show={ showEmailModel } onHide={ handleClose } fullscreen="true">
+      <Modal show={ showEmailModel } fullscreen={true} onHide={ handleClose }>
         <Modal.Header closeButton />
         <Modal.Body className={mailAliasesStyle.modalBody}>{thisAlias}</Modal.Body>
       </Modal>
-    </form>
+    </div>
   );
 }
 
