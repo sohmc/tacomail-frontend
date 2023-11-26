@@ -1,6 +1,8 @@
 require('dotenv').config({ path: '../../.env.local' });
 
-import { SignatureV4 } from '@aws-sdk/signature-v4';
+// Signing code based on:
+//   https://arpadt.com/articles/signing-requests-with-aws-sdk
+import { SignatureV4 } from '@smithy/signature-v4';
 import { Sha256 } from '@aws-crypto/sha256-js';
 
 export async function POST(request) {
@@ -14,11 +16,12 @@ export async function POST(request) {
 
     if (queryString.startsWith('new:')) {
       // remove 'new:'
-      returnObject = await createAlias(queryString.slice(3));
+      returnObject = await createAlias(queryString.slice(4));
     } else {
       returnObject = await queryDatabase(queryString);
     }
 
+    console.log('route:request:new -- ' + JSON.stringify(returnObject));
     return Response.json(returnObject);
   } else if (formData.get('action')) {
     const action = formData.get('action');
@@ -36,12 +39,23 @@ export async function POST(request) {
 
 async function createAlias(newAlias) {
   const endpoint = '/alias';
+
+  const [ alias, subdomain ] = newAlias.split('@');
   const requestBody = {
-    'alias': newAlias,
+    'alias': alias,
     'domain': subdomain,
-    'destination': ''
+    'destination': 'S3'
   }
-  return newAlias;
+
+  const responseJson = await sendApiRequest('POST', endpoint, requestBody);
+
+  // If we get an array and the fullEmailAddress is the same as the newAlias,
+  // then return the alias record, and add 'new' to the object.
+  if (Array.isArray(responseJson) && (responseJson[0].fullEmailAddress == newAlias)) {
+    return [{ ...responseJson[0], 'new': true }]
+  } else {
+    return responseJson;
+  }
 }
 
 async function aliasOperation(action, aliasUuid) {
@@ -60,7 +74,7 @@ async function queryDatabase(queryString) {
 }
 
 
-async function sendApiRequest(requestMethod = 'GET', endpoint, _payload = {}) {
+async function sendApiRequest(requestMethod = 'GET', endpoint, payload = {}) {
   const baseUrl = process.env.LAMBDA_URL;
   const apiUrl = new URL(endpoint, baseUrl);
 
@@ -101,14 +115,23 @@ async function sendApiRequest(requestMethod = 'GET', endpoint, _payload = {}) {
     signPayload.query = canonicalQueryObject;
   }
 
+  // Check if there is a payload
+  console.log('route:payload -- ' + JSON.stringify(payload));
+  if (Object.keys(payload).length > 0) signPayload.body = JSON.stringify(payload);
+
   // Get Signature
   const signed = await sigv4.sign(signPayload);
   console.log('route:signedRequest -- ' + JSON.stringify(signed));
 
-  const fetchResults = await fetch(apiUrl.href, {
+  // fetch
+  const fetchParams = {
     method: requestMethod,
     headers: signed.headers,
-  });
+  };
+
+  // If there is a payload, attach it to the body.
+  if (Object.keys(payload).length > 0) fetchParams.body = JSON.stringify(payload);
+  const fetchResults = await fetch(apiUrl.href, fetchParams);
 
   const data = await fetchResults.json();
   console.log('route:sendApiRequest -- ' + JSON.stringify(data));
