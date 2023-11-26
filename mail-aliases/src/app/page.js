@@ -39,14 +39,14 @@ export default function OpenPage() {
     }
   }
 
-  async function aliasOperation(action, aliasUuid){
+  async function aliasOperation(action, aliasUuid) {
     const formData = new FormData();
     formData.append('action', action);
     formData.append('uuid', aliasUuid);
 
     const apiRequest = {
       method: 'POST',
-      body: formData
+      body: formData,
     };
 
     const fetchResults = await fetch('/api', apiRequest);
@@ -54,9 +54,8 @@ export default function OpenPage() {
 
     if (fetchResultsJson.length === 1) {
       const newResults = results.map(alias => {
-        if (alias.uuid == fetchResultsJson[0].uuid) 
-          return fetchResultsJson[0];
-        else return alias
+        if (alias.uuid == fetchResultsJson[0].uuid) return fetchResultsJson[0];
+        else return alias;
       });
 
       setResults(newResults);
@@ -79,12 +78,12 @@ export default function OpenPage() {
         </Accordion.Header>
         <Accordion.Body>
           <p>Destination: {alias.destination}</p>
-          { !alias.active ||  alias.ignore ? <Button variant='success' onClick={ () => aliasOperation('activate', alias.uuid) }>Activate</Button> : null }{' '}
-          {  alias.active || !alias.ignore ? <Button variant='warning' onClick={ () => aliasOperation('deactivate', alias.uuid) }>Deactivate</Button> : null }{' '}
-          {  alias.active && !alias.ignore ? <Button variant='secondary' onClick={ () => aliasOperation('ignore', alias.uuid) }>Ignore</Button> : null }{' '}
+          { !alias.active || alias.ignore ? <Button variant='success' onClick={ () => aliasOperation('activate', alias.uuid) }>Activate</Button> : null }{' '}
+          { alias.active || !alias.ignore ? <Button variant='warning' onClick={ () => aliasOperation('deactivate', alias.uuid) }>Deactivate</Button> : null }{' '}
+          { alias.active && !alias.ignore ? <Button variant='secondary' onClick={ () => aliasOperation('ignore', alias.uuid) }>Ignore</Button> : null }{' '}
           <Button variant='info' onClick={ () => handleShow(alias.fullEmailAddress) }>Embiggen</Button>
         </Accordion.Body>
-      </Accordion.Item>
+      </Accordion.Item>,
     );
 
     aliasList = <Accordion>{accordionList}</Accordion>;

@@ -28,9 +28,9 @@ export async function POST(request) {
     const aliasUuid = formData.get('uuid');
 
     if (['activate', 'deactivate', 'ignore'].indexOf(action) == -1)
-      return Response.json({'error': 'Invalid alias operation: ' + action});
+      return Response.json({ 'error': 'Invalid alias operation: ' + action });
     if (!formData.get('uuid'))
-      return Response.json({'error': 'Invalid alias uuid: ' + aliasUuid});
+      return Response.json({ 'error': 'Invalid alias uuid: ' + aliasUuid });
 
     returnObject = await aliasOperation(action, aliasUuid);
     return Response.json(returnObject);
@@ -44,22 +44,21 @@ async function createAlias(newAlias) {
   const requestBody = {
     'alias': alias,
     'domain': subdomain,
-    'destination': 'S3'
-  }
+    'destination': 'S3',
+  };
 
   const responseJson = await sendApiRequest('POST', endpoint, requestBody);
 
   // If we get an array and the fullEmailAddress is the same as the newAlias,
   // then return the alias record, and add 'new' to the object.
-  if (Array.isArray(responseJson) && (responseJson[0].fullEmailAddress == newAlias)) {
-    return [{ ...responseJson[0], 'new': true }]
-  } else {
+  if (Array.isArray(responseJson) && (responseJson[0].fullEmailAddress == newAlias))
+    return [{ ...responseJson[0], 'new': true }];
+  else
     return responseJson;
-  }
 }
 
 async function aliasOperation(action, aliasUuid) {
-  const endpoint = '/alias/' + aliasUuid + '/' + action
+  const endpoint = '/alias/' + aliasUuid + '/' + action;
 
   const responseJson = await sendApiRequest('GET', endpoint);
   return responseJson;
@@ -106,7 +105,7 @@ async function sendApiRequest(requestMethod = 'GET', endpoint, payload = {}) {
   if (apiUrl.searchParams.toString().length > 0) {
     const params = apiUrl.searchParams.toString().split('&');
     const canonicalQueryObject = {};
-    
+
     params.forEach(element => {
       const [p, v] = element.split('=');
       canonicalQueryObject[decodeURIComponent(p)] = decodeURIComponent(v);
