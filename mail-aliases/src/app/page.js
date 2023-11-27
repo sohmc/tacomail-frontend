@@ -12,7 +12,7 @@ import mailAliasesStyle from '../stylesheets/mail-aliases.module.css';
 
 export default function OpenPage() {
   const [query, _setQuery] = useState('');
-  // const [error, setError] = useState(null);
+  const [error, setError] = useState(null);
   const [results, setResults] = useState(null);
 
   const [showEmailModel, setShowEmailModel] = useState(false);
@@ -35,7 +35,10 @@ export default function OpenPage() {
       const fetchResults = await fetch('/api', apiRequest);
 
       const fetchResultsJson = await fetchResults.json();
-      setResults(fetchResultsJson);
+      if (Object.prototype.hasOwnProperty.call(fetchResultsJson, 'message') || Object.prototype.hasOwnProperty.call(fetchResultsJson, 'error'))
+        setError(fetchResultsJson);
+      else
+        setResults(fetchResultsJson);
     }
   }
 
@@ -68,7 +71,7 @@ export default function OpenPage() {
     setShowEmailModel(true);
   };
 
-  let aliasList = '';
+  let resultDisplay = '';
   if (results) {
     const accordionList = results.map(alias =>
       <Accordion.Item eventKey={alias.uuid} key={alias.uuid}>
@@ -86,11 +89,22 @@ export default function OpenPage() {
       </Accordion.Item>,
     );
 
-    aliasList = <Accordion>{accordionList}</Accordion>;
+    resultDisplay = <Accordion>{accordionList}</Accordion>;
     if (results[0].new) {
       console.log('Setting defaultActiveKey: ' + results[0].uuid);
-      aliasList = <Accordion defaultActiveKey={results[0].uuid}>{accordionList}</Accordion>;
+      resultDisplay = <Accordion defaultActiveKey={results[0].uuid}>{accordionList}</Accordion>;
     }
+  } else if (error) {
+    resultDisplay = (
+      <Accordion defaultActiveKey='0'>
+        <Accordion.Item eventKey='0' key='0' className='border-danger'>
+          <Accordion.Header>Error executing query</Accordion.Header>
+          <Accordion.Body>
+            <p>{ error.message || error.error }</p>
+          </Accordion.Body>
+        </Accordion.Item>
+      </Accordion>
+    );
   }
 
   return (
@@ -101,7 +115,7 @@ export default function OpenPage() {
         <Button type="submit">Execute</Button>
       </form>
       <br/>
-      {results ? <>{aliasList}</> : 'no results'}
+      {results || error ? <>{ resultDisplay }</> : 'no results'}
       <Modal show={ showEmailModel } fullscreen={true} onHide={ handleClose }>
         <Modal.Header closeButton />
         <Modal.Body className={mailAliasesStyle.modalBody}>{thisAlias}</Modal.Body>
