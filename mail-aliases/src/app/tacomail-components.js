@@ -1,3 +1,4 @@
+import { Dropdown, DropdownButton } from 'react-bootstrap';
 import mailAliasesStyle from '../stylesheets/mail-aliases.module.css';
 
 export function GetIcons({ ignoreFlag, activeFlag, newFlag }) {
@@ -25,4 +26,16 @@ export function GetIcons({ ignoreFlag, activeFlag, newFlag }) {
   }
 
   return (icon);
+}
+
+export function DomainDropdown({ configDomains }) {
+  if (!Array.isArray(configDomains) || configDomains.length == 0) return (null);
+  console.log('tacomail-components:DomainDropdown -- Running with: ' + JSON.stringify(configDomains));
+
+  const activeDomains = configDomains.filter(domain => domain.active);
+  return (
+    <DropdownButton variant="outline-secondary" title="Select Domain" id="input-group-dropdown-2" align="end">
+      { activeDomains.length > 0 ? activeDomains.map(element => (<Dropdown.Item key={element.subdomain}>{element.subdomain}</Dropdown.Item>)) : (<Dropdown.Item key='noconfig'>No Configuration Set</Dropdown.Item>)}
+    </DropdownButton>
+  );
 }
