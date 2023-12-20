@@ -4,10 +4,12 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import Button from 'react-bootstrap/Button';
 import Accordion from 'react-bootstrap/Accordion';
 import Modal from 'react-bootstrap/Modal';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 import { GetIcons } from './tacomail-components';
+import { QueryInputField } from './inputText';
 import mailAliasesStyle from '../stylesheets/mail-aliases.module.css';
+import { Col, Row } from 'react-bootstrap';
 
 
 export default function OpenPage() {
@@ -17,6 +19,20 @@ export default function OpenPage() {
 
   const [showEmailModel, setShowEmailModel] = useState(false);
   const [thisAlias, setThisAlias] = useState('');
+
+  const [tacoMailDomains, setTacoMailDomains] = useState({});
+  const [createNew, setCreateNew] = useState(false);
+
+  useEffect(() => {
+    async function getConfig() {
+      const fetchResults = await fetch('/api/config', { method: 'POST' });
+      console.log(JSON.stringify(fetchResults));
+
+      setTacoMailDomains(fetchResults);
+    }
+    getConfig();
+  }, []);
+
 
   async function sendQuery(q) {
     q.preventDefault();
@@ -111,8 +127,14 @@ export default function OpenPage() {
     <div className={mailAliasesStyle.mainContainer}>
       <h1 className={mailAliasesStyle.textCenter}>mikesoh.com mail aliases</h1>
       <form onSubmit={sendQuery} className={mailAliasesStyle.textCenter}>
-        <input type="text" name="query" defaultValue={query} className={mailAliasesStyle.textbox} />{'  '}
-        <Button type="submit">Execute</Button>
+        <Row className='align-items-center'>
+          <Col xs={10}>
+            <QueryInputField defaultValue={query} />
+          </Col>
+          <Col>
+            <Button type="submit">Execute</Button>
+          </Col>
+        </Row>
       </form>
       <br/>
       {results || error ? <>{ resultDisplay }</> : 'no results'}
