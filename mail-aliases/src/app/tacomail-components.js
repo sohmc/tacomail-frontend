@@ -1,4 +1,4 @@
-import { Dropdown, DropdownButton } from 'react-bootstrap';
+import { Form } from 'react-bootstrap';
 import mailAliasesStyle from '../stylesheets/mail-aliases.module.css';
 
 export function GetIcons({ ignoreFlag, activeFlag, newFlag }) {
@@ -34,8 +34,9 @@ export function DomainDropdown({ configDomains }) {
 
   const activeDomains = configDomains.filter(domain => domain.active);
   return (
-    <DropdownButton variant="outline-secondary" title="Select Domain" id="input-group-dropdown-2" align="end">
-      { activeDomains.length > 0 ? activeDomains.map(element => (<Dropdown.Item key={element.subdomain}>{element.subdomain}</Dropdown.Item>)) : (<Dropdown.Item key='noconfig'>No Configuration Set</Dropdown.Item>)}
-    </DropdownButton>
+    <Form.Select size='sm'>
+      { activeDomains.length > 0 ? (<option>Select a Domain</option>) : null }
+      { activeDomains.length > 0 ? activeDomains.map(element => (<option value={element.subdomain} key={element.subdomain}>{element.subdomain}</option>)) : (<option value='noconfig'>No Configuration Set</option>)}
+    </Form.Select>
   );
 }

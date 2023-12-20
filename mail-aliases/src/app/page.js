@@ -126,7 +126,7 @@ export default function OpenPage() {
         <Tabs>
           <Tab eventKey='Search' title='Search'>
             <br/>
-            <Row className='align-items-center'>
+            <Row className='align-items-top'>
               <Col xs={10}>
                 <QueryInputField defaultValue={query} />
               </Col>
@@ -137,7 +137,7 @@ export default function OpenPage() {
           </Tab>
           <Tab eventKey='Create' title='Create'>
             <br/>
-            <Row className='align-items-center'>
+            <Row className='align-items-top'>
               <Col xs={10}>
                 <InputGroup className='mb-3'>
                   <Button variant='outline-secondary' id='randomizer'>
@@ -146,7 +146,7 @@ export default function OpenPage() {
                       <path d="M13 5.466V1.534a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384l-2.36 1.966a.25.25 0 0 1-.41-.192zm0 9v-3.932a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384l-2.36 1.966a.25.25 0 0 1-.41-.192z"/>
                     </svg>
                   </Button>
-                  <QueryInputField defaultValue={query} />
+                  <QueryInputField defaultValue={query} className='w-50' />
                   <DomainDropdown configDomains={tacoMailDomains} />
                 </InputGroup>
               </Col>
