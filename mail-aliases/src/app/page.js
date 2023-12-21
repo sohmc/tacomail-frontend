@@ -150,6 +150,7 @@ export default function OpenPage() {
                     </svg>
                   </Button>
                   <Form.Control type="text" name='create' defaultValue={query} className='w-50'/>
+                  <InputGroup.Text>@</InputGroup.Text>
                   <DomainDropdown configDomains={tacoMailDomains} />
                 </InputGroup>
               </Col>

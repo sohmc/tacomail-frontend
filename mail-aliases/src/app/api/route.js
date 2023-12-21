@@ -30,8 +30,9 @@ export async function POST(request) {
     returnObject = await aliasOperation(action, aliasUuid);
     return Response.json(returnObject);
   } else if (formData.get('create')) {
-    console.log('route.request.create -- ' + JSON.stringify(formData.get('create')));
-    const createString = formData.get('create').toLowerCase();
+    console.log('route.request.create -- ' + JSON.stringify(formData.get('create')) + JSON.stringify(formData.get('selectedDomain')));
+
+    const createString = formData.get('create').toLowerCase() + '@' + formData.get('selectedDomain').toLowerCase();
 
     returnObject = await createAlias(createString);
 
