@@ -4,7 +4,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import { Col, Row, Tabs, Tab, Button, Accordion, Modal, InputGroup} from 'react-bootstrap';
 import { useState, useEffect } from 'react';
 
-import { GetIcons, DomainDropdown } from './tacomail-components';
+import { GetIcons, DomainDropdown } from './components/tacomail-components';
 import { QueryInputField } from './inputText';
 import mailAliasesStyle from '../stylesheets/mail-aliases.module.css';
 
@@ -33,17 +33,18 @@ export default function OpenPage() {
   async function sendQuery(q) {
     q.preventDefault();
 
+    // Read the form data
     const formData = new FormData(q.target);
     const formJson = Object.fromEntries(formData.entries());
 
-    console.log('formJson: ' + JSON.stringify(formJson));
-
-    const apiRequest = {
-      method: 'POST',
-      body: formData,
-    };
+    console.log('page.sendQuery -- formJson: ' + JSON.stringify(formJson));
 
     if (Object.prototype.hasOwnProperty.call(formJson, 'query') && formJson.query.length > 0) {
+      const apiRequest = {
+        method: 'POST',
+        body: formData,
+      };
+
       const fetchResults = await fetch('/api', apiRequest);
 
       const fetchResultsJson = await fetchResults.json();
@@ -122,9 +123,9 @@ export default function OpenPage() {
   return (
     <div className={mailAliasesStyle.mainContainer}>
       <h1 className={mailAliasesStyle.textCenter}>mikesoh.com mail aliases</h1>
-      <form onSubmit={sendQuery} className={mailAliasesStyle.textCenter}>
-        <Tabs>
-          <Tab eventKey='Search' title='Search'>
+      <Tabs>
+        <Tab eventKey='Search' title='Search'>
+          <form onSubmit={sendQuery} className={mailAliasesStyle.textCenter}>
             <br/>
             <Row className='align-items-top'>
               <Col xs={10}>
@@ -134,8 +135,10 @@ export default function OpenPage() {
                 <Button type="submit">Search</Button>
               </Col>
             </Row>
-          </Tab>
-          <Tab eventKey='Create' title='Create'>
+          </form>
+        </Tab>
+        <Tab eventKey='Create' title='Create'>
+          <form onSubmit={sendQuery} className={mailAliasesStyle.textCenter}>
             <br/>
             <Row className='align-items-top'>
               <Col xs={10}>
@@ -151,12 +154,12 @@ export default function OpenPage() {
                 </InputGroup>
               </Col>
               <Col>
-                <Button type="submit">Search</Button>
+                <Button type="submit">Create</Button>
               </Col>
             </Row>
-          </Tab>
-        </Tabs>
-      </form>
+          </form>
+        </Tab>
+      </Tabs>
       {results || error ? <>{ resultDisplay }</> : 'no results'}
       <Modal show={ showEmailModel } fullscreen={true} onHide={ handleClose }>
         <Modal.Header closeButton />
