@@ -1,4 +1,5 @@
 import { Button } from 'react-bootstrap';
+import { spaceSlug, adjective, noun } from 'space-slug';
 
 export function RandomizerButton() {
   function randomizer() {
@@ -6,9 +7,11 @@ export function RandomizerButton() {
     const queryText = createInputField.value;
 
     let newString = '';
-    if (queryText.indexOf('.')) {
+    if (queryText.indexOf('.') > 0) {
       // Only keep the first part
       newString = queryText.split('.')[0] + '.' + generateRandomString(4);
+    } else {
+      newString = spaceSlug([ adjective(1), noun(1) ], { separator: '' });
     }
 
     createInputField.value = newString;
