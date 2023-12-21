@@ -1,11 +1,10 @@
 'use client';
 
 import 'bootstrap/dist/css/bootstrap.min.css';
-import { Col, Row, Tabs, Tab, Button, Accordion, Modal, InputGroup} from 'react-bootstrap';
+import { Col, Row, Tabs, Tab, Button, Accordion, Modal, InputGroup, Form } from 'react-bootstrap';
 import { useState, useEffect } from 'react';
 
 import { GetIcons, DomainDropdown } from './components/tacomail-components';
-import { QueryInputField } from './inputText';
 import mailAliasesStyle from '../stylesheets/mail-aliases.module.css';
 
 
@@ -39,7 +38,8 @@ export default function OpenPage() {
 
     console.log('page.sendQuery -- formJson: ' + JSON.stringify(formJson));
 
-    if (Object.prototype.hasOwnProperty.call(formJson, 'query') && formJson.query.length > 0) {
+    if (((Object.prototype.hasOwnProperty.call(formJson, 'search') && formJson.search.length > 0)
+        || ((Object.prototype.hasOwnProperty.call(formJson, 'create') && formJson.create.length > 0)))) {
       const apiRequest = {
         method: 'POST',
         body: formData,
@@ -129,10 +129,10 @@ export default function OpenPage() {
             <br/>
             <Row className='align-items-top'>
               <Col xs={10}>
-                <QueryInputField defaultValue={query} />
+                <Form.Control type="text" name='search' defaultValue={query}/>
               </Col>
               <Col>
-                <Button type="submit">Search</Button>
+                <Button type='submit'>Search</Button>
               </Col>
             </Row>
           </form>
@@ -149,12 +149,12 @@ export default function OpenPage() {
                       <path d="M13 5.466V1.534a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384l-2.36 1.966a.25.25 0 0 1-.41-.192zm0 9v-3.932a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384l-2.36 1.966a.25.25 0 0 1-.41-.192z"/>
                     </svg>
                   </Button>
-                  <QueryInputField defaultValue={query} className='w-50' />
+                  <Form.Control type="text" name='create' defaultValue={query} className='w-50'/>
                   <DomainDropdown configDomains={tacoMailDomains} />
                 </InputGroup>
               </Col>
               <Col>
-                <Button type="submit">Create</Button>
+                <Button type='submit'>Create</Button>
               </Col>
             </Row>
           </form>

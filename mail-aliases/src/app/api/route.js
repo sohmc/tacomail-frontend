@@ -10,18 +10,13 @@ export async function POST(request) {
 
   const formData = await request.formData();
 
-  if (formData.get('query')) {
-    const queryString = formData.get('query').toLowerCase();
-    console.log('route:request -- ' + JSON.stringify(formData.get('query')));
+  if (formData.get('search')) {
+    const searchString = formData.get('search').toLowerCase();
+    console.log('route.request.search -- ' + JSON.stringify(formData.get('search')));
 
-    if (queryString.startsWith('new:')) {
-      // remove 'new:'
-      returnObject = await createAlias(queryString.slice(4));
-    } else {
-      returnObject = await queryDatabase(queryString);
-    }
+    returnObject = await searchDatabase(searchString);
 
-    console.log('route:request:new -- ' + JSON.stringify(returnObject));
+    console.log('route:request:search -- RETURNING ' + JSON.stringify(returnObject));
     return Response.json(returnObject);
   } else if (formData.get('action')) {
     const action = formData.get('action');
@@ -33,6 +28,14 @@ export async function POST(request) {
       return Response.json({ 'error': 'Invalid alias uuid: ' + aliasUuid });
 
     returnObject = await aliasOperation(action, aliasUuid);
+    return Response.json(returnObject);
+  } else if (formData.get('create')) {
+    console.log('route.request.create -- ' + JSON.stringify(formData.get('create')));
+    const createString = formData.get('create').toLowerCase();
+
+    returnObject = await createAlias(createString);
+
+    console.log('route:request:create -- RETURNING ' + JSON.stringify(returnObject));
     return Response.json(returnObject);
   }
 }
@@ -65,8 +68,8 @@ async function aliasOperation(action, aliasUuid) {
 }
 
 
-async function queryDatabase(queryString) {
-  const endpoint = '/alias?q=' + queryString;
+async function searchDatabase(searchString) {
+  const endpoint = '/alias?q=' + searchString;
 
   const responseJson = await sendApiRequest('GET', endpoint);
   return responseJson;
