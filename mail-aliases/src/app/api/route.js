@@ -32,8 +32,10 @@ export async function POST(request) {
   } else if (formData.get('create')) {
     console.log('route.request.create -- ' + JSON.stringify(formData.get('create')) + JSON.stringify(formData.get('selectedDomain')));
 
-    const createString = formData.get('create').toLowerCase() + '@' + formData.get('selectedDomain').toLowerCase();
+    if (!formData.get('selectedDomain') || formData.get('selectedDomain').length == 0)
+      return Response.json({ 'error': 'Invalid domain selected: ' + formData.get('selectedDomain') });
 
+    const createString = formData.get('create').toLowerCase() + '@' + formData.get('selectedDomain').toLowerCase();
     returnObject = await createAlias(createString);
 
     console.log('route:request:create -- RETURNING ' + JSON.stringify(returnObject));

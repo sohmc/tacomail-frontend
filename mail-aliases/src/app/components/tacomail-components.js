@@ -33,8 +33,8 @@ export function DomainDropdown({ configDomains }) {
 
   const activeDomains = configDomains.filter(domain => domain.active);
   return (
-    <Form.Select size='sm' name='selectedDomain'>
-      { activeDomains.length > 0 ? (<option>Select a Domain</option>) : null }
+    <Form.Select size='sm' name='selectedDomain' required>
+      { activeDomains.length > 0 ? (<option value=''>Select a Domain</option>) : null }
       { activeDomains.length > 0 ? activeDomains.map(element => (<option value={element.subdomain} key={element.subdomain}>{element.subdomain}</option>)) : (<option value='noconfig'>No Configuration Set</option>)}
     </Form.Select>
   );

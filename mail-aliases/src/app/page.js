@@ -6,7 +6,7 @@ import { useState, useEffect } from 'react';
 
 import { GetIcons, DomainDropdown } from './components/tacomail-components';
 import mailAliasesStyle from '../stylesheets/mail-aliases.module.css';
-import { RandomizerButton } from './components/inputField';
+import { RandomizerButton } from './components/inputRandomizer';
 
 
 export default function OpenPage() {
