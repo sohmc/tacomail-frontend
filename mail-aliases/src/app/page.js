@@ -164,7 +164,7 @@ export default function OpenPage() {
       {results || error ? <>{ resultDisplay }</> : 'no results'}
       <Modal show={ showEmailModel } fullscreen={true} onHide={ handleClose }>
         <Modal.Header closeButton />
-        <Modal.Body className={mailAliasesStyle.modalBody}>{thisAlias}</Modal.Body>
+        <Modal.Body className='fs-1 text-break text-center'>{thisAlias}</Modal.Body>
       </Modal>
     </div>
   );
