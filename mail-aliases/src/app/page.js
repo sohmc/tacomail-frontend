@@ -5,7 +5,6 @@ import { Col, Row, Tabs, Tab, Button, InputGroup, Form } from 'react-bootstrap';
 import { useState, useEffect } from 'react';
 
 import { DomainDropdown } from './components/tacomail-components';
-import mailAliasesStyle from '../stylesheets/mail-aliases.module.css';
 import { RandomizerButton } from './components/inputRandomizer';
 import { BuildEmailAccordion, BuildErrorAccordion } from './components/reportAccordion';
 
@@ -55,7 +54,7 @@ export default function OpenPage() {
   }
 
   return (
-    <div className={mailAliasesStyle.mainContainer}>
+    <div className='w-50 m-auto'>
       <h1 className='text-center'>mikesoh.com mail aliases</h1>
       <Tabs>
         <Tab eventKey='Search' title='Search'>
