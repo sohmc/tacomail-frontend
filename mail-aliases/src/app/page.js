@@ -1,21 +1,19 @@
 'use client';
 
 import 'bootstrap/dist/css/bootstrap.min.css';
-import { Col, Row, Tabs, Tab, Button, Accordion, Modal, InputGroup, Form } from 'react-bootstrap';
+import { Col, Row, Tabs, Tab, Button, InputGroup, Form } from 'react-bootstrap';
 import { useState, useEffect } from 'react';
 
-import { GetIcons, DomainDropdown } from './components/tacomail-components';
+import { DomainDropdown } from './components/tacomail-components';
 import mailAliasesStyle from '../stylesheets/mail-aliases.module.css';
 import { RandomizerButton } from './components/inputRandomizer';
+import { BuildEmailAccordion, BuildErrorAccordion } from './components/reportAccordion';
 
 
 export default function OpenPage() {
   const [query, _setQuery] = useState('');
   const [error, setError] = useState(null);
   const [results, setResults] = useState(null);
-
-  const [showEmailModel, setShowEmailModel] = useState(false);
-  const [thisAlias, setThisAlias] = useState('');
 
   const [tacoMailDomains, setTacoMailDomains] = useState({});
 
@@ -56,77 +54,12 @@ export default function OpenPage() {
     }
   }
 
-  async function aliasOperation(action, aliasUuid) {
-    const formData = new FormData();
-    formData.append('action', action);
-    formData.append('uuid', aliasUuid);
-
-    const apiRequest = {
-      method: 'POST',
-      body: formData,
-    };
-
-    const fetchResults = await fetch('/api', apiRequest);
-    const fetchResultsJson = await fetchResults.json();
-
-    if (fetchResultsJson.length === 1) {
-      const newResults = results.map(alias => {
-        if (alias.uuid == fetchResultsJson[0].uuid) return fetchResultsJson[0];
-        else return alias;
-      });
-
-      setResults(newResults);
-    }
-  }
-
-  const handleClose = () => setShowEmailModel(false);
-  const handleShow = (emailAddress) => {
-    setThisAlias(emailAddress);
-    setShowEmailModel(true);
-  };
-
-  let resultDisplay = '';
-  if (results) {
-    const accordionList = results.map(alias =>
-      <Accordion.Item eventKey={alias.uuid} key={alias.uuid}>
-        <Accordion.Header>
-          {alias.fullEmailAddress}
-          <GetIcons ignoreFlag={alias.ignore} activeFlag={alias.active} newFlag={alias.new} />
-        </Accordion.Header>
-        <Accordion.Body>
-          <p>Destination: {alias.destination}</p>
-          { !alias.active || alias.ignore ? <Button variant='success' onClick={ () => aliasOperation('activate', alias.uuid) }>Activate</Button> : null }{' '}
-          { alias.active || !alias.ignore ? <Button variant='warning' onClick={ () => aliasOperation('deactivate', alias.uuid) }>Deactivate</Button> : null }{' '}
-          { alias.active && !alias.ignore ? <Button variant='secondary' onClick={ () => aliasOperation('ignore', alias.uuid) }>Ignore</Button> : null }{' '}
-          <Button variant='info' onClick={ () => handleShow(alias.fullEmailAddress) }>Embiggen</Button>
-        </Accordion.Body>
-      </Accordion.Item>,
-    );
-
-    resultDisplay = <Accordion>{accordionList}</Accordion>;
-    if (results[0].new) {
-      console.log('Setting defaultActiveKey: ' + results[0].uuid);
-      resultDisplay = <Accordion defaultActiveKey={results[0].uuid}>{accordionList}</Accordion>;
-    }
-  } else if (error) {
-    resultDisplay = (
-      <Accordion defaultActiveKey='0'>
-        <Accordion.Item eventKey='0' key='0' className='border-danger'>
-          <Accordion.Header>Error executing query</Accordion.Header>
-          <Accordion.Body>
-            <p>{ error.message || error.error }</p>
-          </Accordion.Body>
-        </Accordion.Item>
-      </Accordion>
-    );
-  }
-
   return (
     <div className={mailAliasesStyle.mainContainer}>
-      <h1 className={mailAliasesStyle.textCenter}>mikesoh.com mail aliases</h1>
+      <h1 className='text-center'>mikesoh.com mail aliases</h1>
       <Tabs>
         <Tab eventKey='Search' title='Search'>
-          <form onSubmit={sendQuery} className={mailAliasesStyle.textCenter}>
+          <form onSubmit={sendQuery} className='text-center pb-3'>
             <br/>
             <Row className='align-items-top'>
               <Col xs={10}>
@@ -139,7 +72,7 @@ export default function OpenPage() {
           </form>
         </Tab>
         <Tab eventKey='Create' title='Create'>
-          <form onSubmit={sendQuery} className={mailAliasesStyle.textCenter}>
+          <form onSubmit={sendQuery} className='text-center'>
             <br/>
             <Row className='align-items-top'>
               <Col xs={10}>
@@ -157,11 +90,7 @@ export default function OpenPage() {
           </form>
         </Tab>
       </Tabs>
-      {results || error ? <>{ resultDisplay }</> : 'no results'}
-      <Modal show={ showEmailModel } fullscreen={true} onHide={ handleClose }>
-        <Modal.Header closeButton />
-        <Modal.Body className='fs-1 text-break text-center'>{thisAlias}</Modal.Body>
-      </Modal>
+      { results ? <BuildEmailAccordion emailArray={results} onResultMutate={setResults} /> : <BuildErrorAccordion errorObject={error} />}
     </div>
   );
 }
