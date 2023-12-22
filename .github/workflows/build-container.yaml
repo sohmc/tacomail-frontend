@@ -16,7 +16,7 @@ jobs:
       - name: Login to Dockerhub
         uses: docker/login-action@v2
         with:
-          registroy: ghcr.io
+          registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}  
 
@@ -35,10 +35,9 @@ jobs:
           buildkitd-flags: --debug
 
       - name: Build the Docker image
-        working-directory: ./mail-aliases/
         uses: docker/build-push-action@v5
         with:
-          context: .
+          context: ./mail-aliases/
           file: ./Dockerfile
           platforms: linux/amd64,linux/arm64,linux/arm/v7
           push: true
