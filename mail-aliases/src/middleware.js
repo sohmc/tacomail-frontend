@@ -1,6 +1,9 @@
 import { _NextRequest, NextResponse } from 'next/server';
 
 export function middleware(request) {
+  const forwardedHost = request.headers.get('X-Forwarded-Host');
+  if (forwardedHost === null) return NextResponse.next();
+
   const requestedUrl = request.nextUrl.clone();
   const basePath = '/tacomail';
 
