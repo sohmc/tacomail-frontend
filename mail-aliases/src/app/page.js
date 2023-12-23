@@ -18,7 +18,7 @@ export default function OpenPage() {
 
   useEffect(() => {
     async function getConfig() {
-      const fetchResults = await fetch('/api/config', { method: 'POST' });
+      const fetchResults = await fetch('api/config', { method: 'POST' });
       const fetchedConfig = await fetchResults.json();
 
       console.log('page.getConfig -- ' + JSON.stringify(fetchedConfig));
@@ -43,7 +43,7 @@ export default function OpenPage() {
         body: formData,
       };
 
-      const fetchResults = await fetch('/api', apiRequest);
+      const fetchResults = await fetch('api', apiRequest);
 
       const fetchResultsJson = await fetchResults.json();
       if (Object.prototype.hasOwnProperty.call(fetchResultsJson, 'message') || Object.prototype.hasOwnProperty.call(fetchResultsJson, 'error'))
