@@ -1,9 +1,11 @@
 import { _NextRequest, NextResponse } from 'next/server';
 
 export function middleware(request) {
+  // If X-Forwarded-Host is not set, then don't bother with middleware.
   const forwardedHost = request.headers.get('X-Forwarded-Host');
   if (forwardedHost === null) return NextResponse.next();
 
+  // Middleware starts here
   const requestedUrl = request.nextUrl.clone();
   const basePath = '/tacomail';
 
@@ -13,28 +15,14 @@ export function middleware(request) {
   console.log('basePath set: ' + basePath);
   console.log('requestedUrl: ' + requestedUrl.toString());
   console.log('basePath index: ' + requestedUrl.toString().indexOf(basePath));
-  // console.log('X-Forwarded-Path: ' + forwardedPath);
 
   if (requestedUrl.toString().indexOf(basePath) == -1) {
-    console.log('basePath not detected.');
+    console.log('basePath not detected in request.');
 
     const pathForward = basePath + requestedUrl.toString().split('localhost:3000').pop();
-    console.log('Will forward to: ' + pathForward);
+    console.log('Will offer (proxy): ' + pathForward);
     return NextResponse.rewrite(new URL(pathForward, request.url));
   }
-
-  // if (isProduction && requestedHost && !requestedHost.match(/example.com/)) {
-  //   const host = `example.com`; // set your main domain
-
-  //   const requestedPort = request.headers.get('X-Forwarded-Port');
-  //   const requestedProto = request.headers.get('X-Forwarded-Proto');
-
-  //   url.host = host;
-  //   url.protocol = requestedProto || url.protocol;
-  //   url.port = requestedPort || url.port;
-
-  //   return NextResponse.redirect(url);
-  // }
 
   return NextResponse.next();
 }
