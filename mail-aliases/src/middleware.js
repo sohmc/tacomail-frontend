@@ -2,7 +2,7 @@ import { _NextRequest, NextResponse } from 'next/server';
 
 export function middleware(request) {
   const requestedUrl = request.nextUrl.clone();
-  const basePath = '/tmail';
+  const basePath = '/tacomail';
 
   // const requestedHost = request.headers.get('X-Forwarded-Host');
   // const forwardedPath = request.headers.get('X-Forwarded-Path');
@@ -17,7 +17,7 @@ export function middleware(request) {
 
     const pathForward = basePath + requestedUrl.toString().split('localhost:3000').pop();
     console.log('Will forward to: ' + pathForward);
-    return NextResponse.rewrite(new URL(pathForward));
+    return NextResponse.rewrite(new URL(pathForward, request.url));
   }
 
   // if (isProduction && requestedHost && !requestedHost.match(/example.com/)) {
