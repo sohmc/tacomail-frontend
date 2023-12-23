@@ -7,7 +7,10 @@ export function middleware(request) {
 
   // Middleware starts here
   const requestedUrl = request.nextUrl.clone();
-  const basePath = '/tacomail';
+  const basePath = process.env.BASE_PATH || '/';
+
+  // Don't do any processing if base path is not set;
+  if (basePath === '/') return NextResponse.next();
 
   // const requestedHost = request.headers.get('X-Forwarded-Host');
   // const forwardedPath = request.headers.get('X-Forwarded-Path');
