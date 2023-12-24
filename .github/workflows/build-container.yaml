@@ -36,6 +36,7 @@ jobs:
             type=ref,event=pr
             type=semver,pattern={{version}}
             type=semver,pattern={{major}}.{{minor}}
+            type=edge,pattern=dev-edge
     
       - name: Show metadata action output
         run: |
