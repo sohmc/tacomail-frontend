@@ -1,4 +1,4 @@
-require('dotenv').config({ path: '../../.env.local' });
+import { logger } from '@/serverComponents/logger';
 
 // Signing code based on:
 //   https://arpadt.com/articles/signing-requests-with-aws-sdk
@@ -12,11 +12,11 @@ export async function POST(request) {
 
   if (formData.get('search')) {
     const searchString = formData.get('search').toLowerCase();
-    console.log('route.request.search -- ' + JSON.stringify(formData.get('search')));
+    logger.info('(api/route.POST) request.search -- ' + JSON.stringify(formData.get('search')));
 
     returnObject = await searchDatabase(searchString);
 
-    console.log('route:request:search -- RETURNING ' + JSON.stringify(returnObject));
+    logger.debug('(api/route.POST) request.search -- RETURNING ' + JSON.stringify(returnObject));
     return Response.json(returnObject);
   } else if (formData.get('action')) {
     const action = formData.get('action');
@@ -30,7 +30,7 @@ export async function POST(request) {
     returnObject = await aliasOperation(action, aliasUuid);
     return Response.json(returnObject);
   } else if (formData.get('create')) {
-    console.log('route.request.create -- ' + JSON.stringify(formData.get('create')) + JSON.stringify(formData.get('selectedDomain')));
+    logger.info('(api/route.POST) request.create -- ' + JSON.stringify(formData.get('create')) + JSON.stringify(formData.get('selectedDomain')));
 
     if (!formData.get('selectedDomain') || formData.get('selectedDomain').length == 0)
       return Response.json({ 'error': 'Invalid domain selected: ' + formData.get('selectedDomain') });
@@ -38,7 +38,7 @@ export async function POST(request) {
     const createString = formData.get('create').toLowerCase() + '@' + formData.get('selectedDomain').toLowerCase();
     returnObject = await createAlias(createString);
 
-    console.log('route:request:create -- RETURNING ' + JSON.stringify(returnObject));
+    logger.info('(api/route.POST) request.create -- RETURNING ' + JSON.stringify(returnObject));
     return Response.json(returnObject);
   }
 }

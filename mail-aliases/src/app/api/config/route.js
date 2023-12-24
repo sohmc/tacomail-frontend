@@ -1,4 +1,3 @@
-// require('dotenv').config({ path: '../../.env.local' });
 import { logger } from '@/serverComponents/logger';
 
 // Signing code based on:
