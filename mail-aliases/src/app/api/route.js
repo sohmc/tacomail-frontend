@@ -1,11 +1,6 @@
 import { winstonLogger } from '@/serverComponents/logger';
 import { sendApiRequest } from '@/serverComponents/executeLambda';
 
-// Signing code based on:
-//   https://arpadt.com/articles/signing-requests-with-aws-sdk
-import { SignatureV4 } from '@smithy/signature-v4';
-import { Sha256 } from '@aws-crypto/sha256-js';
-
 export async function POST(request) {
   let returnObject = {};
 
