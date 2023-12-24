@@ -3,11 +3,12 @@ name: Build Docker Image for Next.js React App
 on:
   push:
     branches:
-      - main
       - dev-*
     paths-ignore:
       - 'README.md'
       - 'LICENSE'
+    tags:
+      - v*
 
 jobs:
   build-image-and-push:
@@ -18,6 +19,20 @@ jobs:
     
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      
+      - name: Git Version
+        id: version
+        uses: codacy/git-version@2.8.0
+      
+      - name: Show git-version info
+        run: |
+          echo "Previous Version: ${PREV_VERSION}"
+          echo "New Version: ${VERSION}"
+        env:
+          PREV_VERSION: ${{ steps.version.outputs.previous-version }}
+          VERSION: ${{ steps.version.outputs.version }}          
 
       - name: Login to Dockerhub
         uses: docker/login-action@v2
@@ -33,21 +48,18 @@ jobs:
           images: ghcr.io/${{ github.repository }}
           tags: |
             type=ref,event=branch
-            type=ref,event=pr
+            type=ref,event=tag
             type=semver,pattern={{version}}
+            type=semver,pattern={{major}}
             type=semver,pattern={{major}}.{{minor}}
-            type=edge,pattern=dev-edge
-            type=raw,value=foobar
     
       - name: Show metadata action output
         run: |
-          echo "Tags: ${META_TAGS}"
-          echo "Labels: ${META_LABELS}"
+          echo "This Version: ${DOCKER_METADATA_OUTPUT_VERSION}"
+          echo "Image Tags: ${DOCKER_METADATA_OUTPUT_TAGS}"
+          echo "Image Labels: ${DOCKER_METADATA_OUTPUT_LABELS}"
           echo "json: ${DOCKER_METADATA_OUTPUT_JSON}"
           echo "annotations: ${DOCKER_METADATA_OUTPUT_ANNOTATIONS}"
-        env:
-          META_TAGS: ${{ steps.meta.outputs.tags }}
-          META_LABELS: ${{ steps.meta.outputs.labels }}
 
       - name: Set up QEMU
         id: qemu
@@ -59,13 +71,11 @@ jobs:
           AVAILABLE: ${{ steps.qemu.outputs.platforms }}
 
       - name: Set up Docker Buildx
-        if: github.ref == 'disabled-for-now'
         uses: docker/setup-buildx-action@v3
         with:
           buildkitd-flags: --debug
 
       - name: Build the Docker image
-        if: github.ref == 'disabled-for-now'
         uses: docker/build-push-action@v5
         with:
           context: ./mail-aliases/
