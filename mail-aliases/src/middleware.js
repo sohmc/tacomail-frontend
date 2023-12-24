@@ -12,17 +12,23 @@ export function middleware(request) {
   // const requestedHost = request.headers.get('X-Forwarded-Host');
   // const forwardedPath = request.headers.get('X-Forwarded-Path');
 
-  console.log('basePath set: ' + basePath);
-  console.log('requestedUrl: ' + requestedUrl.toString());
-  console.log('basePath index: ' + requestedUrl.toString().indexOf(basePath));
+  logger('basePath set: ' + basePath);
+  logger('requestedUrl: ' + requestedUrl.toString());
+  logger('basePath index: ' + requestedUrl.toString().indexOf(basePath));
 
   if (requestedUrl.toString().indexOf(basePath) == -1) {
-    console.log('basePath not detected in request.');
+    logger('basePath not detected in request.');
 
     const pathForward = basePath + requestedUrl.toString().split('localhost:3000').pop();
-    console.log('Will offer (proxy): ' + pathForward);
+    logger('Will offer (proxy): ' + pathForward);
     return NextResponse.rewrite(new URL(pathForward, request.url));
   }
 
   return NextResponse.next();
+}
+
+function logger(msg) {
+  const logLevel = process.env.LOG_LEVEL || (process.env.NODE_ENV == 'development' ? 'debug' : 'info');
+
+  if (logLevel == 'debug') console.log(msg);
 }
