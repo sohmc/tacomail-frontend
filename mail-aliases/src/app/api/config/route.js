@@ -1,4 +1,5 @@
-require('dotenv').config({ path: '../../.env.local' });
+// require('dotenv').config({ path: '../../.env.local' });
+import { logger } from '@/serverComponents/logger';
 
 // Signing code based on:
 //   https://arpadt.com/articles/signing-requests-with-aws-sdk
@@ -9,7 +10,7 @@ export async function POST() {
   const endpoint = '/domain';
   const responseJson = await sendApiRequest('GET', endpoint);
 
-  console.log('config/route: -- Got the following domain objects: ' + JSON.stringify(responseJson));
+  logger.debug('(config/route.POST) Got the following domain objects: ' + JSON.stringify(responseJson));
   return Response.json(responseJson);
 }
 
@@ -42,7 +43,7 @@ async function sendApiRequest(requestMethod = 'GET', endpoint, payload = {}) {
   };
 
   // Check query endpoint for URL Parameters
-  console.log('config/route:searchParams -- ' + apiUrl.searchParams.toString());
+  logger.info('(config/route.sendApiRequest) searchParams -- ' + apiUrl.searchParams.toString());
   if (apiUrl.searchParams.toString().length > 0) {
     const params = apiUrl.searchParams.toString().split('&');
     const canonicalQueryObject = {};
@@ -56,12 +57,12 @@ async function sendApiRequest(requestMethod = 'GET', endpoint, payload = {}) {
   }
 
   // Check if there is a payload
-  console.log('config/route:payload -- ' + JSON.stringify(payload));
+  logger.info('(config/route.sendApiRequest) payload -- ' + JSON.stringify(payload));
   if (Object.keys(payload).length > 0) signPayload.body = JSON.stringify(payload);
 
   // Get Signature
   const signed = await sigv4.sign(signPayload);
-  console.log('config/route:signedRequest -- ' + JSON.stringify(signed));
+  logger.debug('(config/route.sendApiRequest) signedRequest -- ' + JSON.stringify(signed));
 
   // fetch
   const fetchParams = {
@@ -74,6 +75,6 @@ async function sendApiRequest(requestMethod = 'GET', endpoint, payload = {}) {
   const fetchResults = await fetch(apiUrl.href, fetchParams);
 
   const data = await fetchResults.json();
-  console.log('config/route:sendApiRequest -- ' + JSON.stringify(data));
+  logger.debug('(config/route.sendApiRequest) fetchResults -- ' + JSON.stringify(data));
   return data;
 }

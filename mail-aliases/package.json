@@ -16,7 +16,8 @@
     "react": "^18",
     "react-bootstrap": "^2.9.1",
     "react-dom": "^18",
-    "space-slug": "^1.1.0"
+    "space-slug": "^1.1.0",
+    "winston": "^3.11.0"
   },
   "devDependencies": {
     "@next/eslint-plugin-next": "^14.0.3",
