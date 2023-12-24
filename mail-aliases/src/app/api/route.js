@@ -49,6 +49,7 @@ async function createAlias(alias, subdomain) {
     'destination': 'S3',
   };
 
+  const newAlias = [alias, subdomain].join('@');
   const responseJson = await sendApiRequest('POST', endpoint, requestBody);
 
   // If we get an array and the fullEmailAddress is the same as the newAlias,
