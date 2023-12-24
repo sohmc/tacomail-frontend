@@ -5,7 +5,7 @@ const winstonLogLevel = process.env.LOG_LEVEL || (process.env.NODE_ENV == 'devel
 console.log('LOG_LEVEL: ' + winstonLogLevel);
 console.log('NODE_ENV:  ' + process.env.NODE_ENV);
 
-export const logger = winston.createLogger({
+export const winstonLogger = winston.createLogger({
   level: winstonLogLevel,
   format: combine(
     colorize(),

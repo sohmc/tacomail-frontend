@@ -1,4 +1,4 @@
-import { logger } from '@/serverComponents/logger';
+import { winstonLogger } from '@/serverComponents/logger';
 
 // Signing code based on:
 //   https://arpadt.com/articles/signing-requests-with-aws-sdk
@@ -33,7 +33,7 @@ export async function sendApiRequest(requestMethod = 'GET', endpoint, payload = 
   };
 
   // Check query endpoint for URL Parameters
-  logger.info('(config/route.sendApiRequest) searchParams -- ' + apiUrl.searchParams.toString());
+  winstonLogger.info('(config/route.sendApiRequest) searchParams -- ' + apiUrl.searchParams.toString());
   if (apiUrl.searchParams.toString().length > 0) {
     const params = apiUrl.searchParams.toString().split('&');
     const canonicalQueryObject = {};
@@ -47,12 +47,12 @@ export async function sendApiRequest(requestMethod = 'GET', endpoint, payload = 
   }
 
   // Check if there is a payload
-  logger.info('(config/route.sendApiRequest) payload -- ' + JSON.stringify(payload));
+  winstonLogger.info('(config/route.sendApiRequest) payload -- ' + JSON.stringify(payload));
   if (Object.keys(payload).length > 0) signPayload.body = JSON.stringify(payload);
 
   // Get Signature
   const signed = await sigv4.sign(signPayload);
-  logger.debug('(config/route.sendApiRequest) signedRequest -- ' + JSON.stringify(signed));
+  winstonLogger.debug('(config/route.sendApiRequest) signedRequest -- ' + JSON.stringify(signed));
 
   // fetch
   const fetchParams = {
@@ -65,6 +65,6 @@ export async function sendApiRequest(requestMethod = 'GET', endpoint, payload = 
   const fetchResults = await fetch(apiUrl.href, fetchParams);
 
   const data = await fetchResults.json();
-  logger.debug('(config/route.sendApiRequest) fetchResults -- ' + JSON.stringify(data));
+  winstonLogger.debug('(config/route.sendApiRequest) fetchResults -- ' + JSON.stringify(data));
   return data;
 }

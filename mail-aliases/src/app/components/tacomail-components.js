@@ -29,8 +29,6 @@ export function GetIcons({ ignoreFlag, activeFlag, newFlag }) {
 
 export function DomainDropdown({ configDomains }) {
   if (!Array.isArray(configDomains) || configDomains.length == 0) return (null);
-  console.log('tacomail-components:DomainDropdown -- Running with: ' + JSON.stringify(configDomains));
-
   const activeDomains = configDomains.filter(domain => domain.active);
   return (
     <Form.Select size='sm' name='selectedDomain' required>

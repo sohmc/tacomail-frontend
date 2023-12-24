@@ -1,4 +1,5 @@
 'use client';
+import { pinoLogger } from '@/serverComponents/pinoLogger';
 
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { Col, Row, Tabs, Tab, Button, InputGroup, Form } from 'react-bootstrap';
@@ -21,7 +22,7 @@ export default function OpenPage() {
       const fetchResults = await fetch('api/config', { method: 'POST' });
       const fetchedConfig = await fetchResults.json();
 
-      console.log('page.getConfig -- ' + JSON.stringify(fetchedConfig));
+      pinoLogger.debug('(page.useEffect.getConfig) fetchedConfig: ' + JSON.stringify(fetchedConfig));
       setTacoMailDomains(fetchedConfig);
     }
     getConfig();
@@ -34,7 +35,7 @@ export default function OpenPage() {
     const formData = new FormData(q.target);
     const formJson = Object.fromEntries(formData.entries());
 
-    console.log('page.sendQuery -- formJson: ' + JSON.stringify(formJson));
+    pinoLogger.info('(page.sendQuery) formJson: ' + JSON.stringify(formJson));
 
     if (((Object.prototype.hasOwnProperty.call(formJson, 'search') && formJson.search.length > 0)
         || ((Object.prototype.hasOwnProperty.call(formJson, 'create') && formJson.create.length > 0)))) {
