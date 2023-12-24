@@ -30,19 +30,19 @@ export async function POST(request) {
 
     if (!formData.get('selectedDomain') || formData.get('selectedDomain').length == 0)
       return Response.json({ 'error': 'Invalid domain selected: ' + formData.get('selectedDomain') });
+    else if (!formData.get('create').toLowerCase().trim().length == 0)
+      return Response.json({ 'error': 'Must provide an alias.' });
 
-    const createString = formData.get('create').toLowerCase() + '@' + formData.get('selectedDomain').toLowerCase();
-    returnObject = await createAlias(createString);
+    returnObject = await createAlias(formData.get('create').toLowerCase().trim(), formData.get('selectedDomain').toLowerCase());
 
     winstonLogger.info('(api/route.POST) request.create -- RETURNING ' + JSON.stringify(returnObject));
     return Response.json(returnObject);
   }
 }
 
-async function createAlias(newAlias) {
+async function createAlias(alias, subdomain) {
   const endpoint = '/alias';
 
-  const [ alias, subdomain ] = newAlias.split('@');
   const requestBody = {
     'alias': alias,
     'domain': subdomain,
