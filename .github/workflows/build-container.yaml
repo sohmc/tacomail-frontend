@@ -2,12 +2,15 @@ name: Build Docker Image for Next.js React App
 
 on:
   push:
+    branches:
+      - main
+      - dev-*
     paths-ignore:
       - 'README.md'
       - 'LICENSE'
 
 jobs:
-  prep-environment:
+  build-image-and-push:
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -33,6 +36,14 @@ jobs:
             type=ref,event=pr
             type=semver,pattern={{version}}
             type=semver,pattern={{major}}.{{minor}}
+    
+      - name: Show metadata action output
+        run: |
+          echo "Tags: ${META_TAGS}"
+          echo "Labels: ${META_LABELS}"
+        env:
+          META_TAGS: ${{ steps.meta.outputs.tags }}
+          META_LABELS: ${{ steps.meta.outputs.labels }}
 
       - name: Set up QEMU
         id: qemu
@@ -44,11 +55,13 @@ jobs:
           AVAILABLE: ${{ steps.qemu.outputs.platforms }}
 
       - name: Set up Docker Buildx
+        if: github.ref == 'disabled-for-now'
         uses: docker/setup-buildx-action@v3
         with:
           buildkitd-flags: --debug
 
       - name: Build the Docker image
+        if: github.ref == 'disabled-for-now'
         uses: docker/build-push-action@v5
         with:
           context: ./mail-aliases/
