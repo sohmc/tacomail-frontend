@@ -37,11 +37,14 @@ jobs:
             type=semver,pattern={{version}}
             type=semver,pattern={{major}}.{{minor}}
             type=edge,pattern=dev-edge
+            type=raw,value=foobar
     
       - name: Show metadata action output
         run: |
           echo "Tags: ${META_TAGS}"
           echo "Labels: ${META_LABELS}"
+          echo "json: ${DOCKER_METADATA_OUTPUT_JSON}"
+          echo "annotations: ${DOCKER_METADATA_OUTPUT_ANNOTATIONS}"
         env:
           META_TAGS: ${{ steps.meta.outputs.tags }}
           META_LABELS: ${{ steps.meta.outputs.labels }}
