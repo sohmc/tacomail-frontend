@@ -5,7 +5,8 @@ import { GetIcons } from './tacomail-components';
 
 
 export function BuildEmailAccordion({ emailArray, onResultMutate }) {
-  const [showEmailModel, setShowEmailModel] = useState(false);
+  const [showEmailEmbiggenModel, setShowEmbiggenEmailModel] = useState(false);
+  const [showClipboardToast, setShowClipboardToast] = useState(false);
   const [thisAlias, setThisAlias] = useState('');
 
   if (!Array.isArray(emailArray) || emailArray.length == 0) return (null);
@@ -35,11 +36,18 @@ export function BuildEmailAccordion({ emailArray, onResultMutate }) {
     }
   }
 
-  const handleClose = () => setShowEmailModel(false);
-  const handleShow = (emailAddress) => {
+  const handleClose = () => setShowEmbiggenEmailModel(false);
+  const handleEmbiggenShow = (emailAddress) => {
     setThisAlias(emailAddress);
-    setShowEmailModel(true);
+    setShowEmbiggenEmailModel(true);
   };
+
+  const copyToClipboard = async (emailAddress) => {
+    await navigator.clipboard.writeText(emailAddress);
+    setShowClipboardToast(true);
+    setTimeout(() => setTimeout(setShowClipboardToast(false)), 3000);
+  };
+
 
   return (
     <>
@@ -52,14 +60,15 @@ export function BuildEmailAccordion({ emailArray, onResultMutate }) {
             </Accordion.Header>
             <Accordion.Body>
               <p>Destination: {alias.destination}</p>
+              <Button variant={showClipboardToast ? 'outline-primary' : 'primary'} onClick={ () => copyToClipboard(alias.fullEmailAddress) }>{ showClipboardToast ? 'Copied!' : 'Copy to Clipboard' }</Button>{' '}
               { !alias.active || alias.ignore ? <Button variant='success' onClick={ () => aliasOperation('activate', alias.uuid) }>Activate</Button> : <Button variant='warning' onClick={ () => aliasOperation('deactivate', alias.uuid) }>Deactivate</Button> }{' '}
               { alias.active && alias.ignore ? <Button variant='warning' onClick={ () => aliasOperation('deactivate', alias.uuid) }>Deactivate</Button> : null }{' '}
               { alias.active && !alias.ignore ? <Button variant='secondary' onClick={ () => aliasOperation('ignore', alias.uuid) }>Ignore</Button> : null }{' '}
-              <Button variant='info' onClick={ () => handleShow(alias.fullEmailAddress) }>Embiggen</Button>
+              <Button variant='info' onClick={ () => handleEmbiggenShow(alias.fullEmailAddress) }>Embiggen</Button>
             </Accordion.Body>
           </Accordion.Item>) }
       </Accordion>
-      <Modal show={ showEmailModel } fullscreen={true} onHide={ handleClose }>
+      <Modal show={ showEmailEmbiggenModel } fullscreen={true} onHide={ handleClose }>
         <Modal.Header closeButton />
         <Modal.Body className='fs-1 text-break text-center'>{thisAlias}</Modal.Body>
       </Modal>

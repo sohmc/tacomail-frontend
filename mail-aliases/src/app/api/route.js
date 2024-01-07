@@ -30,7 +30,7 @@ export async function POST(request) {
 
     if (!formData.get('selectedDomain') || formData.get('selectedDomain').length == 0)
       return Response.json({ 'error': 'Invalid domain selected: ' + formData.get('selectedDomain') });
-    else if (!formData.get('create').toLowerCase().trim().length == 0)
+    else if (formData.get('create').toLowerCase().trim().length == 0)
       return Response.json({ 'error': 'Must provide an alias.' });
 
     returnObject = await createAlias(formData.get('create').toLowerCase().trim(), formData.get('selectedDomain').toLowerCase());
