@@ -1,6 +1,6 @@
 {
   "name": "mail-aliases",
-  "version": "0.1.0",
+  "version": "0.1.0+build.19-commit.a37074cc008d90ec9b87279232cc6014e3312e9c",
   "repository": {
     "type": "git",
     "url": "https://github.com/sohmc/tacomail-frontend"

@@ -8,6 +8,7 @@ import { useState, useEffect } from 'react';
 import { DomainDropdown } from './components/tacomail-components';
 import { RandomizerButton } from './components/inputRandomizer';
 import { BuildEmailAccordion, BuildErrorAccordion } from './components/reportAccordion';
+import { BuildInfo } from './components/config';
 
 
 export default function OpenPage() {
@@ -16,14 +17,21 @@ export default function OpenPage() {
   const [results, setResults] = useState(null);
 
   const [tacoMailDomains, setTacoMailDomains] = useState({});
+  const [tacomailVersion, setTacomailVersion] = useState({});
 
   useEffect(() => {
     async function getConfig() {
-      const fetchResults = await fetch('api/config', { method: 'POST' });
-      const fetchedConfig = await fetchResults.json();
+      let fetchResults = await fetch('api/config', { method: 'POST' });
+      let fetchedConfig = await fetchResults.json();
 
       pinoLogger.debug('(page.useEffect.getConfig) fetchedConfig: ' + JSON.stringify(fetchedConfig));
       setTacoMailDomains(fetchedConfig);
+
+      fetchResults = await fetch('api/config', { method: 'GET' });
+      fetchedConfig = await fetchResults.json();
+
+      pinoLogger.debug('(page.useEffect.getConfig) fetchedConfig: ' + JSON.stringify(fetchedConfig));
+      setTacomailVersion(fetchedConfig);
     }
     getConfig();
   }, []);
@@ -81,6 +89,21 @@ export default function OpenPage() {
                   <Form.Control type="text" name='create' defaultValue={query} className='w-50'/>
                   <InputGroup.Text>@</InputGroup.Text>
                   <DomainDropdown configDomains={tacoMailDomains} />
+                </InputGroup>
+              </Col>
+              <Col>
+                <Button type='submit'>Create</Button>
+              </Col>
+            </Row>
+          </form>
+        </Tab>
+        <Tab eventKey='Config' title='Configure'>
+          <form onSubmit={sendQuery} className='text-center'>
+            <br/>
+            <Row className='align-items-top'>
+              <Col xs={10}>
+                <InputGroup className='mb-3'>
+                  <BuildInfo versionInfo={ tacomailVersion }/>
                 </InputGroup>
               </Col>
               <Col>
