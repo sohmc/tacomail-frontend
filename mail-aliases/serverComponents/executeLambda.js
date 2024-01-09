@@ -1,4 +1,5 @@
 import { winstonLogger } from '@/serverComponents/logger';
+import { getIamCredentials } from '@/serverComponents/fetchIamCredentials';
 
 // Signing code based on:
 //   https://arpadt.com/articles/signing-requests-with-aws-sdk
@@ -9,13 +10,16 @@ export async function sendApiRequest(requestMethod = 'GET', endpoint, payload = 
   const baseUrl = process.env.LAMBDA_URL;
   const apiUrl = new URL(endpoint, baseUrl);
 
+  const iamCredentials = await getIamCredentials();
+  winstonLogger.info('(config/route) Using credentials: ' + iamCredentials.Source);
+
   // Prepare to sign the request
   const sigv4 = new SignatureV4({
     service: 'lambda',
     region: 'us-east-1',
     credentials: {
-      accessKeyId: process.env.AWS_ACCESS_KEY,
-      secretAccessKey: process.env.AWS_SECRET_KEY,
+      accessKeyId: iamCredentials.AccessKeyId,
+      secretAccessKey: iamCredentials.SecretAccessKey,
     },
     sha256: Sha256,
   });
