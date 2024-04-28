@@ -21,7 +21,7 @@ export function BuildEmailAccordion({ emailArray, onResultMutate }) {
       body: formData,
     };
 
-    const fetchResults = await fetch('/api', apiRequest);
+    const fetchResults = await fetch('api', apiRequest);
     const fetchResultsJson = await fetchResults.json();
 
     if (fetchResultsJson.length === 1) {
