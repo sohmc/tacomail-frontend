@@ -29,7 +29,7 @@ jobs:
       - name: Append git commit-sha to package.json
         run: |
           jq -r --arg BUILD_ID ${BUILD_ID} --arg COMMIT ${COMMIT_SHA} '.version = .version + "+build." + $BUILD_ID + "-commit." + $COMMIT' ./mail-aliases/package.json > ./mail-aliases/new-package.json
-          rm ./mail-aliases/package.json && mv ./mail-aliases/new_package.json ./mail-aliases/package.json
+          rm ./mail-aliases/package.json && mv ./mail-aliases/new-package.json ./mail-aliases/package.json
           cat ./mail-aliases/package.json
         env:
           BUILD_ID: ${{ github.run_number }}
