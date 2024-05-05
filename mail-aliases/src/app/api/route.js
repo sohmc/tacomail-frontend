@@ -1,83 +1,77 @@
-require('dotenv').config({ path: '../../.env.local' });
-
-import { SignatureV4 } from '@aws-sdk/signature-v4';
-import { Sha256 } from '@aws-crypto/sha256-js';
+import { winstonLogger } from '@/serverComponents/logger';
+import { sendApiRequest } from '@/serverComponents/executeLambda';
 
 export async function POST(request) {
   let returnObject = {};
 
   const formData = await request.formData();
-  const queryString = formData.get('query').toLowerCase();
 
-  console.log('route:request -- ' + JSON.stringify(formData.get('query')));
+  if (formData.get('search')) {
+    const searchString = formData.get('search').toLowerCase();
+    winstonLogger.info('(api/route.POST) request.search -- ' + JSON.stringify(formData.get('search')));
 
-  if (queryString.startsWith('new:')) {
-    returnObject = await createAlias(queryString.slice(3));
-  } else {
-    returnObject = await queryDatabase(queryString);
+    returnObject = await searchDatabase(searchString);
+
+    winstonLogger.debug('(api/route.POST) request.search -- RETURNING ' + JSON.stringify(returnObject));
+    return Response.json(returnObject);
+  } else if (formData.get('action')) {
+    const action = formData.get('action');
+    const aliasUuid = formData.get('uuid');
+
+    if (['activate', 'deactivate', 'ignore'].indexOf(action) == -1)
+      return Response.json({ 'error': 'Invalid alias operation: ' + action });
+    if (!formData.get('uuid'))
+      return Response.json({ 'error': 'Invalid alias uuid: ' + aliasUuid });
+
+    returnObject = await aliasOperation(action, aliasUuid);
+    return Response.json(returnObject);
+  } else if (formData.get('create')) {
+    winstonLogger.info('(api/route.POST) request.create -- ' + JSON.stringify(formData.get('create')) + JSON.stringify(formData.get('selectedDomain')));
+
+    if (!formData.get('selectedDomain') || formData.get('selectedDomain').length == 0)
+      return Response.json({ 'error': 'Invalid domain selected: ' + formData.get('selectedDomain') });
+    else if (formData.get('create').toLowerCase().trim().length == 0)
+      return Response.json({ 'error': 'Must provide an alias.' });
+
+    returnObject = await createAlias(formData.get('create').toLowerCase().trim(), formData.get('selectedDomain').toLowerCase());
+
+    winstonLogger.info('(api/route.POST) request.create -- RETURNING ' + JSON.stringify(returnObject));
+    return Response.json(returnObject);
   }
-
-  return Response.json(returnObject);
 }
 
-async function createAlias(newAlias) {
-  return newAlias;
+async function createAlias(alias, subdomain) {
+  const endpoint = '/alias';
+
+  const requestBody = {
+    'alias': alias,
+    'domain': subdomain,
+    'destination': 'S3',
+  };
+
+  const newAlias = [alias, subdomain].join('@');
+  const responseJson = await sendApiRequest('POST', endpoint, requestBody);
+
+  // If we get an array and the fullEmailAddress is the same as the newAlias,
+  // then return the alias record, and add 'new' to the object.
+  if (Array.isArray(responseJson) && (responseJson[0].fullEmailAddress == newAlias))
+    return [{ ...responseJson[0], 'new': true }];
+  else
+    return responseJson;
 }
 
-
-async function queryDatabase(queryString) {
-  const endpoint = '/alias?q=' + queryString;
+async function aliasOperation(action, aliasUuid) {
+  const endpoint = '/alias/' + aliasUuid + '/' + action;
 
   const responseJson = await sendApiRequest('GET', endpoint);
   return responseJson;
 }
 
 
-async function sendApiRequest(requestMethod = 'GET', endpoint, _payload = {}) {
-  const baseUrl = process.env.LAMBDA_URL;
-  const apiUrl = new URL(endpoint, baseUrl);
+async function searchDatabase(searchString) {
+  const endpoint = '/alias?q=' + searchString;
 
-  // Prepare to sign the request
-  const sigv4 = new SignatureV4({
-    service: 'lambda',
-    region: 'us-east-1',
-    credentials: {
-      accessKeyId: process.env.AWS_ACCESS_KEY,
-      secretAccessKey: process.env.AWS_SECRET_KEY,
-    },
-    sha256: Sha256,
-  });
-
-  // Check query endpoint for URL Parameters
-  const canonicalQueryObject = {};
-  const params = apiUrl.searchParams.toString().split('&');
-  params.forEach(element => {
-    const [p, v] = element.split('=');
-    canonicalQueryObject[decodeURIComponent(p)] = decodeURIComponent(v);
-  });
-
-  // Send Signing Request
-  const signed = await sigv4.sign({
-    method: requestMethod,
-    hostname: apiUrl.host,
-    path: apiUrl.pathname,
-    protocol: apiUrl.protocol,
-    query: canonicalQueryObject,
-    // query: {"alias": "testing.trumpet@capricadev.tk"},
-    headers: {
-      'Content-Type': 'application/json',
-      host: apiUrl.hostname,
-    },
-  });
-
-  console.log('route:signedRequest -- ' + JSON.stringify(signed));
-
-  const fetchResults = await fetch(apiUrl.href, {
-    method: requestMethod,
-    headers: signed.headers,
-  });
-
-  const data = await fetchResults.json();
-  console.log('route:sendApiRequest -- ' + JSON.stringify(data));
-  return data;
+  const responseJson = await sendApiRequest('GET', endpoint);
+  return responseJson;
 }
+

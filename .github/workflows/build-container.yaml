@@ -1,0 +1,95 @@
+name: Build Docker Image for Next.js React App
+
+on:
+  push:
+    branches:
+      - dev-*
+    paths-ignore:
+      - 'README.md'
+      - 'LICENSE'
+    tags:
+      - v*
+
+jobs:
+  build-image-and-push:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      
+      - name: Git Version
+        id: version
+        uses: codacy/git-version@2.8.0
+      
+      - name: Append git commit-sha to package.json
+        run: |
+          jq -r --arg BUILD_ID ${BUILD_ID} --arg COMMIT ${COMMIT_SHA} '.version = .version + "+build." + $BUILD_ID + "-commit." + $COMMIT' ./mail-aliases/package.json > ./mail-aliases/new-package.json
+          rm ./mail-aliases/package.json && mv ./mail-aliases/new-package.json ./mail-aliases/package.json
+          cat ./mail-aliases/package.json
+        env:
+          BUILD_ID: ${{ github.run_number }}
+          COMMIT_SHA: ${{ github.sha }}
+
+      - name: Show git-version info
+        run: |
+          echo "Previous Version: ${PREV_VERSION}"
+          echo "New Version: ${VERSION}"
+        env:
+          PREV_VERSION: ${{ steps.version.outputs.previous-version }}
+          VERSION: ${{ steps.version.outputs.version }}          
+
+      - name: Login to Dockerhub
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract metadata (tags, labels) for Docker
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ghcr.io/${{ github.repository }}
+          tags: |
+            type=ref,event=branch
+            type=ref,event=tag
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}
+            type=semver,pattern={{major}}.{{minor}}
+    
+      - name: Show metadata action output
+        run: |
+          echo "This Version: ${DOCKER_METADATA_OUTPUT_VERSION}"
+          echo "Image Tags: ${DOCKER_METADATA_OUTPUT_TAGS}"
+          echo "Image Labels: ${DOCKER_METADATA_OUTPUT_LABELS}"
+          echo "json: ${DOCKER_METADATA_OUTPUT_JSON}"
+          echo "annotations: ${DOCKER_METADATA_OUTPUT_ANNOTATIONS}"
+
+      - name: Set up QEMU
+        id: qemu
+        uses: docker/setup-qemu-action@v3
+      
+      - name: Show available architectures via QEMU
+        run: echo ${AVAILABLE}
+        env:
+          AVAILABLE: ${{ steps.qemu.outputs.platforms }}
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+        with:
+          buildkitd-flags: --debug
+
+      - name: Build the Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./mail-aliases/
+          file: ./mail-aliases/Dockerfile
+          platforms: linux/amd64,linux/arm64
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
