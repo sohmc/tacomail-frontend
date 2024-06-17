@@ -85,7 +85,7 @@ jobs:
           buildkitd-flags: --debug
 
       - name: Build the Docker image
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@v6
         with:
           context: ./mail-aliases/
           file: ./mail-aliases/Dockerfile
