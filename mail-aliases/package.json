@@ -13,21 +13,21 @@
   },
   "dependencies": {
     "@aws-crypto/sha256-js": "^5.2.0",
-    "@smithy/signature-v4": "^2.3.0",
+    "@smithy/signature-v4": "^5.0.1",
     "bootstrap": "^5.3.3",
     "next": "^14.2.24",
     "pino": "^8.21.0",
     "react": "^18.3.1",
     "react-bootstrap": "^2.10.9",
     "react-dom": "^18.3.1",
-    "space-slug": "^1.1.0",
+    "space-slug": "^2.1.0",
     "winston": "^3.17.0"
   },
   "devDependencies": {
-    "@next/eslint-plugin-next": "^14.2.24",
+    "@next/eslint-plugin-next": "^15.1.7",
     "autoprefixer": "^10.4.20",
-    "eslint": "^8.57.1",
-    "eslint-config-next": "^14.0.2",
+    "eslint": "^9.20.1",
+    "eslint-config-next": "^15.1.7",
     "postcss": "^8.5.2",
     "tailwindcss": "^3.4.17"
   }
