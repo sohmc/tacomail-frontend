@@ -88,7 +88,7 @@ export function BuildEmailAccordion({ emailArray, onResultMutate }) {
                     <td>{alias.destination}</td>
                     <td>{ convertEpochToDate(alias.created) } </td>
                     <td>{ convertEpochToDate(alias.modified) }</td>
-                    <td>someFlags</td>
+                    <td>{ alias.active ? 'Active' : 'Inactive' } { alias.ignore ? 'Ignore' : null }</td>
                   </tr>
                 </tbody>
               </Table>
