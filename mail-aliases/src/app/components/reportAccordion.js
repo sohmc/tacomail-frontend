@@ -1,6 +1,7 @@
 import { useState } from 'react';
 
 import { Button, Accordion, Modal } from 'react-bootstrap';
+import Table from 'react-bootstrap/Table';
 import { GetIcons } from './tacomail-components';
 
 
@@ -48,6 +49,20 @@ export function BuildEmailAccordion({ emailArray, onResultMutate }) {
     setTimeout(() => setTimeout(setShowClipboardToast(false)), 3000);
   };
 
+  const convertEpochToDate = (epoch) => {
+    const epochDate = new Date(epoch * 1000);
+    let options = {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+      hour: "numeric",
+      minute: "numeric",
+      second: "numeric",
+      hour12: false,
+    };
+    return new Intl.DateTimeFormat("en-US", options).format(epochDate);
+  };
+
 
   return (
     <>
@@ -59,7 +74,25 @@ export function BuildEmailAccordion({ emailArray, onResultMutate }) {
               <GetIcons ignoreFlag={alias.ignore} activeFlag={alias.active} newFlag={alias.new} />
             </Accordion.Header>
             <Accordion.Body>
-              <p>Destination: {alias.destination}</p>
+              <Table hover>
+                <thead>
+                  <tr>
+                    <th>Destination</th>
+                    <th>Created</th>
+                    <th>Modified</th>
+                    <th>Flags</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>{alias.destination}</td>
+                    <td>{ convertEpochToDate(alias.created) } </td>
+                    <td>{ convertEpochToDate(alias.modified) }</td>
+                    <td>someFlags</td>
+                  </tr>
+                </tbody>
+              </Table>
+
               <Button variant={showClipboardToast ? 'outline-primary' : 'primary'} onClick={ () => copyToClipboard(alias.fullEmailAddress) }>{ showClipboardToast ? 'Copied!' : 'Copy to Clipboard' }</Button>{' '}
               { !alias.active || alias.ignore ? <Button variant='success' onClick={ () => aliasOperation('activate', alias.uuid) }>Activate</Button> : <Button variant='warning' onClick={ () => aliasOperation('deactivate', alias.uuid) }>Deactivate</Button> }{' '}
               { alias.active && alias.ignore ? <Button variant='warning' onClick={ () => aliasOperation('deactivate', alias.uuid) }>Deactivate</Button> : null }{' '}
