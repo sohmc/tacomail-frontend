@@ -2,12 +2,13 @@ import { useState } from 'react';
 
 import { Button, Accordion, Modal } from 'react-bootstrap';
 import Table from 'react-bootstrap/Table';
-import { GetIcons } from './tacomail-components';
+import { GetIcons, GetClipboardIcon } from './tacomail-components';
 
 
 export function BuildEmailAccordion({ emailArray, onResultMutate }) {
   const [showEmailEmbiggenModel, setShowEmbiggenEmailModel] = useState(false);
   const [showClipboardToast, setShowClipboardToast] = useState(false);
+  const [clipboardStatus, setClipboardStatus] = useState([]);
   const [thisAlias, setThisAlias] = useState('');
 
   if (!Array.isArray(emailArray) || emailArray.length == 0) return (null);
@@ -45,8 +46,17 @@ export function BuildEmailAccordion({ emailArray, onResultMutate }) {
 
   const copyToClipboard = async (emailAddress) => {
     await navigator.clipboard.writeText(emailAddress);
-    setShowClipboardToast(true);
-    setTimeout(() => setTimeout(setShowClipboardToast(false)), 3000);
+    
+    const oldClipboardStatus = [...clipboardStatus];
+    const newClipboardStatus = clipboardStatus.map(i => {
+      if (i.fullEmailAddress == emailAddress) 
+        return { ...i, 'clipboardStatus': true };
+      else 
+        return i;
+    });
+    
+    setClipboardStatus(newClipboardStatus);
+    setTimeout(() => setTimeout(setClipboardStatus(oldClipboardStatus)), 3000);
   };
 
   const convertEpochToDate = (epoch) => {
@@ -63,6 +73,10 @@ export function BuildEmailAccordion({ emailArray, onResultMutate }) {
     return new Intl.DateTimeFormat("en-US", options).format(epochDate);
   };
 
+  const getClipboardStatus = (email) => {
+    return false;
+    return clipboardStatus.filter((i) => i.fullEmailAddress == email).clipboard
+  }
 
   return (
     <>
@@ -70,8 +84,12 @@ export function BuildEmailAccordion({ emailArray, onResultMutate }) {
         { emailArray.map(alias =>
           <Accordion.Item eventKey={alias.uuid} key={alias.uuid}>
             <Accordion.Header>
-              {alias.fullEmailAddress}
-              <GetIcons ignoreFlag={alias.ignore} activeFlag={alias.active} newFlag={alias.new} />
+              { alias.fullEmailAddress }
+              {/* { setClipboardStatus([ ...clipboardStatus, { 'fullEmailAddress': alias.fullEmailAddress, 'clipboard': false } ])}
+              <GetIcons ignoreFlag={alias.ignore} activeFlag={alias.active} newFlag={alias.new} />{' '}
+              <Button variant={getClipboardStatus(alias.fullEmailAddress) ? 'outline-success' : 'primary'} onClick={ () => copyToClipboard(alias.fullEmailAddress) }>
+                <GetClipboardIcon clipboardStatus={getClipboardStatus(alias.fullEmailAddress)} />
+              </Button> */}
             </Accordion.Header>
             <Accordion.Body>
               <Table hover>
@@ -85,7 +103,7 @@ export function BuildEmailAccordion({ emailArray, onResultMutate }) {
                 </thead>
                 <tbody>
                   <tr>
-                    <td>{alias.destination}</td>
+                    <td>{ alias.destination }</td>
                     <td>{ convertEpochToDate(alias.created) } </td>
                     <td>{ convertEpochToDate(alias.modified) }</td>
                     <td>{ alias.active ? 'Active' : 'Inactive' } { alias.ignore ? 'Ignore' : null }</td>
@@ -93,7 +111,7 @@ export function BuildEmailAccordion({ emailArray, onResultMutate }) {
                 </tbody>
               </Table>
 
-              <Button variant={showClipboardToast ? 'outline-primary' : 'primary'} onClick={ () => copyToClipboard(alias.fullEmailAddress) }>{ showClipboardToast ? 'Copied!' : 'Copy to Clipboard' }</Button>{' '}
+              <Button variant={ getClipboardStatus(alias.fullEmailAddress) ? 'outline-primary' : 'primary' } onClick={ () => copyToClipboard(alias.fullEmailAddress) }>{ getClipboardStatus(alias.fullEmailAddress) ? 'Copied!' : 'Copy to Clipboard' }</Button>{' '}
               { !alias.active || alias.ignore ? <Button variant='success' onClick={ () => aliasOperation('activate', alias.uuid) }>Activate</Button> : <Button variant='warning' onClick={ () => aliasOperation('deactivate', alias.uuid) }>Deactivate</Button> }{' '}
               { alias.active && alias.ignore ? <Button variant='warning' onClick={ () => aliasOperation('deactivate', alias.uuid) }>Deactivate</Button> : null }{' '}
               { alias.active && !alias.ignore ? <Button variant='secondary' onClick={ () => aliasOperation('ignore', alias.uuid) }>Ignore</Button> : null }{' '}
