@@ -6,9 +6,12 @@ import { GetIcons, GetClipboardIcon } from './tacomail-components';
 
 
 export function BuildEmailAccordion({ emailArray, onResultMutate }) {
+  const initialClipboardStatus = emailArray.map(alias => {
+    return {'fullEmailAddress': alias.fullEmailAddress, 'clipboard': false};
+  });
+
   const [showEmailEmbiggenModel, setShowEmbiggenEmailModel] = useState(false);
-  const [showClipboardToast, setShowClipboardToast] = useState(false);
-  const [clipboardStatus, setClipboardStatus] = useState([]);
+  const [clipboardStatus, setClipboardStatus] = useState([ ...initialClipboardStatus ]);
   const [thisAlias, setThisAlias] = useState('');
 
   if (!Array.isArray(emailArray) || emailArray.length == 0) return (null);
@@ -74,8 +77,11 @@ export function BuildEmailAccordion({ emailArray, onResultMutate }) {
   };
 
   const getClipboardStatus = (email) => {
-    return false;
-    return clipboardStatus.filter((i) => i.fullEmailAddress == email).clipboard
+    console.log(JSON.stringify(clipboardStatus));
+    const filteredResults = clipboardStatus.filter((i) => i.fullEmailAddress == email);
+    
+    console.log('returning ' + filteredResults?.[0].clipboardStatus + ' for ' + email);
+    return (filteredResults[0].clipboardStatus || false);
   }
 
   return (
@@ -85,11 +91,10 @@ export function BuildEmailAccordion({ emailArray, onResultMutate }) {
           <Accordion.Item eventKey={alias.uuid} key={alias.uuid}>
             <Accordion.Header>
               { alias.fullEmailAddress }
-              {/* { setClipboardStatus([ ...clipboardStatus, { 'fullEmailAddress': alias.fullEmailAddress, 'clipboard': false } ])}
               <GetIcons ignoreFlag={alias.ignore} activeFlag={alias.active} newFlag={alias.new} />{' '}
               <Button variant={getClipboardStatus(alias.fullEmailAddress) ? 'outline-success' : 'primary'} onClick={ () => copyToClipboard(alias.fullEmailAddress) }>
-                <GetClipboardIcon clipboardStatus={getClipboardStatus(alias.fullEmailAddress)} />
-              </Button> */}
+                <GetClipboardIcon thisClipboardStatus={getClipboardStatus(alias.fullEmailAddress)} />
+              </Button>
             </Accordion.Header>
             <Accordion.Body>
               <Table hover>
