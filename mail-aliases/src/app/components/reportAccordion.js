@@ -1,3 +1,4 @@
+import { pinoLogger } from '@/serverComponents/pinoLogger';
 import { useState } from 'react';
 
 import { Button, Accordion, Modal } from 'react-bootstrap';
@@ -8,7 +9,6 @@ import { GetIcons, GetClipboardIcon } from './tacomail-components';
 export function BuildEmailAccordion({ emailArray, onResultMutate }) {
   const [showEmailEmbiggenModel, setShowEmbiggenEmailModel] = useState(false);
   const [showClipboardToast, setShowClipboardToast] = useState(false);
-  const [clipboardStatus, setClipboardStatus] = useState([]);
   const [thisAlias, setThisAlias] = useState('');
 
   if (!Array.isArray(emailArray) || emailArray.length == 0) return (null);
@@ -46,17 +46,8 @@ export function BuildEmailAccordion({ emailArray, onResultMutate }) {
 
   const copyToClipboard = async (emailAddress) => {
     await navigator.clipboard.writeText(emailAddress);
-    
-    const oldClipboardStatus = [...clipboardStatus];
-    const newClipboardStatus = clipboardStatus.map(i => {
-      if (i.fullEmailAddress == emailAddress) 
-        return { ...i, 'clipboardStatus': true };
-      else 
-        return i;
-    });
-    
-    setClipboardStatus(newClipboardStatus);
-    setTimeout(() => setTimeout(setClipboardStatus(oldClipboardStatus)), 3000);
+    setShowClipboardToast(true);
+    setTimeout(() => setTimeout(setShowClipboardToast(false)), 3000);
   };
 
   const convertEpochToDate = (epoch) => {
@@ -73,11 +64,6 @@ export function BuildEmailAccordion({ emailArray, onResultMutate }) {
     return new Intl.DateTimeFormat("en-US", options).format(epochDate);
   };
 
-  const getClipboardStatus = (email) => {
-    return false;
-    return clipboardStatus.filter((i) => i.fullEmailAddress == email).clipboard
-  }
-
   return (
     <>
       <Accordion>
@@ -85,11 +71,6 @@ export function BuildEmailAccordion({ emailArray, onResultMutate }) {
           <Accordion.Item eventKey={alias.uuid} key={alias.uuid}>
             <Accordion.Header>
               { alias.fullEmailAddress }
-              {/* { setClipboardStatus([ ...clipboardStatus, { 'fullEmailAddress': alias.fullEmailAddress, 'clipboard': false } ])}
-              <GetIcons ignoreFlag={alias.ignore} activeFlag={alias.active} newFlag={alias.new} />{' '}
-              <Button variant={getClipboardStatus(alias.fullEmailAddress) ? 'outline-success' : 'primary'} onClick={ () => copyToClipboard(alias.fullEmailAddress) }>
-                <GetClipboardIcon clipboardStatus={getClipboardStatus(alias.fullEmailAddress)} />
-              </Button> */}
             </Accordion.Header>
             <Accordion.Body>
               <Table hover>
@@ -111,7 +92,7 @@ export function BuildEmailAccordion({ emailArray, onResultMutate }) {
                 </tbody>
               </Table>
 
-              <Button variant={ getClipboardStatus(alias.fullEmailAddress) ? 'outline-primary' : 'primary' } onClick={ () => copyToClipboard(alias.fullEmailAddress) }>{ getClipboardStatus(alias.fullEmailAddress) ? 'Copied!' : 'Copy to Clipboard' }</Button>{' '}
+              <Button variant={showClipboardToast ? 'outline-primary' : 'primary'} onClick={ () => copyToClipboard(alias.fullEmailAddress) }>{ showClipboardToast ? 'Copied!' : 'Copy to Clipboard' }</Button>{' '}
               { !alias.active || alias.ignore ? <Button variant='success' onClick={ () => aliasOperation('activate', alias.uuid) }>Activate</Button> : <Button variant='warning' onClick={ () => aliasOperation('deactivate', alias.uuid) }>Deactivate</Button> }{' '}
               { alias.active && alias.ignore ? <Button variant='warning' onClick={ () => aliasOperation('deactivate', alias.uuid) }>Deactivate</Button> : null }{' '}
               { alias.active && !alias.ignore ? <Button variant='secondary' onClick={ () => aliasOperation('ignore', alias.uuid) }>Ignore</Button> : null }{' '}
