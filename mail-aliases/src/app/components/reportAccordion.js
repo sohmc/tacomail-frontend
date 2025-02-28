@@ -1,3 +1,4 @@
+import { pinoLogger } from '@/serverComponents/pinoLogger';
 import { useState } from 'react';
 
 import { Button, Accordion, Modal } from 'react-bootstrap';
@@ -80,10 +81,10 @@ export function BuildEmailAccordion({ emailArray, onResultMutate }) {
   };
 
   const getClipboardState = (email) => {
-    console.log(JSON.stringify(clipboardState));
+    pinoLogger.debug('(reportAccordion.BuildEmailAccordion.getClipboardState) clipboardState: ' + JSON.stringify(clipboardState));
     const filteredResults = clipboardState.filter((i) => i.fullEmailAddress == email);
     
-    console.log('returning ' + filteredResults?.[0].clipboard + ' for ' + email);
+    pinoLogger.debug('(reportAccordion.BuildEmailAccordion.getClipboardState) clipboardState: returning ' + filteredResults?.[0].clipboard + ' for ' + email);
     return (filteredResults[0].clipboard || false);
   }
 
