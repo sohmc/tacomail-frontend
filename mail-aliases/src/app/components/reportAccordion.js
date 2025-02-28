@@ -6,12 +6,12 @@ import { GetIcons, GetClipboardIcon } from './tacomail-components';
 
 
 export function BuildEmailAccordion({ emailArray, onResultMutate }) {
-  const initialClipboardStatus = emailArray.map(alias => {
+  const initialClipboardState = emailArray.map(alias => {
     return {'fullEmailAddress': alias.fullEmailAddress, 'clipboard': false};
   });
 
   const [showEmailEmbiggenModel, setShowEmbiggenEmailModel] = useState(false);
-  const [clipboardStatus, setClipboardStatus] = useState([ ...initialClipboardStatus ]);
+  const [clipboardState, setClipboardState] = useState([ ...initialClipboardState ]);
   const [thisAlias, setThisAlias] = useState('');
 
   if (!Array.isArray(emailArray) || emailArray.length == 0) return (null);
@@ -49,18 +49,21 @@ export function BuildEmailAccordion({ emailArray, onResultMutate }) {
 
   const copyToClipboard = async (emailAddress) => {
     await navigator.clipboard.writeText(emailAddress);
-    
-    const oldClipboardStatus = [...clipboardStatus];
-    const newClipboardStatus = clipboardStatus.map(i => {
-      if (i.fullEmailAddress == emailAddress) 
-        return { ...i, 'clipboardStatus': true };
-      else 
+    setNewClipboardStatus(emailAddress, true);
+    setTimeout(() => setTimeout(setNewClipboardStatus(emailAddress, false)), 3000);
+  };
+
+  const setNewClipboardStatus = (emailAddress, newClipboardStatus) => {
+    const newClipboardStatusState = clipboardState.map(i => {
+      if (i.fullEmailAddress == emailAddress)
+        return { ...i, 'clipboard': newClipboardStatus };
+      else
         return i;
     });
-    
-    setClipboardStatus(newClipboardStatus);
-    setTimeout(() => setTimeout(setClipboardStatus(oldClipboardStatus)), 3000);
-  };
+
+    setClipboardState(newClipboardStatusState);
+    return null;
+  }
 
   const convertEpochToDate = (epoch) => {
     const epochDate = new Date(epoch * 1000);
@@ -76,12 +79,12 @@ export function BuildEmailAccordion({ emailArray, onResultMutate }) {
     return new Intl.DateTimeFormat("en-US", options).format(epochDate);
   };
 
-  const getClipboardStatus = (email) => {
-    console.log(JSON.stringify(clipboardStatus));
-    const filteredResults = clipboardStatus.filter((i) => i.fullEmailAddress == email);
+  const getClipboardState = (email) => {
+    console.log(JSON.stringify(clipboardState));
+    const filteredResults = clipboardState.filter((i) => i.fullEmailAddress == email);
     
-    console.log('returning ' + filteredResults?.[0].clipboardStatus + ' for ' + email);
-    return (filteredResults[0].clipboardStatus || false);
+    console.log('returning ' + filteredResults?.[0].clipboard + ' for ' + email);
+    return (filteredResults[0].clipboard || false);
   }
 
   return (
@@ -92,8 +95,8 @@ export function BuildEmailAccordion({ emailArray, onResultMutate }) {
             <Accordion.Header>
               { alias.fullEmailAddress }
               <GetIcons ignoreFlag={alias.ignore} activeFlag={alias.active} newFlag={alias.new} />{' '}
-              <Button variant={getClipboardStatus(alias.fullEmailAddress) ? 'outline-success' : 'primary'} onClick={ () => copyToClipboard(alias.fullEmailAddress) }>
-                <GetClipboardIcon thisClipboardStatus={getClipboardStatus(alias.fullEmailAddress)} />
+              <Button variant={getClipboardState(alias.fullEmailAddress) ? 'outline-success' : 'primary'} onClick={ () => copyToClipboard(alias.fullEmailAddress) }>
+                <GetClipboardIcon thisClipboardStatus={getClipboardState(alias.fullEmailAddress)} />
               </Button>
             </Accordion.Header>
             <Accordion.Body>
@@ -116,7 +119,7 @@ export function BuildEmailAccordion({ emailArray, onResultMutate }) {
                 </tbody>
               </Table>
 
-              <Button variant={ getClipboardStatus(alias.fullEmailAddress) ? 'outline-primary' : 'primary' } onClick={ () => copyToClipboard(alias.fullEmailAddress) }>{ getClipboardStatus(alias.fullEmailAddress) ? 'Copied!' : 'Copy to Clipboard' }</Button>{' '}
+              <Button variant={ getClipboardState(alias.fullEmailAddress) ? 'outline-primary' : 'primary' } onClick={ () => copyToClipboard(alias.fullEmailAddress) }>{ getClipboardState(alias.fullEmailAddress) ? 'Copied!' : 'Copy to Clipboard' }</Button>{' '}
               { !alias.active || alias.ignore ? <Button variant='success' onClick={ () => aliasOperation('activate', alias.uuid) }>Activate</Button> : <Button variant='warning' onClick={ () => aliasOperation('deactivate', alias.uuid) }>Deactivate</Button> }{' '}
               { alias.active && alias.ignore ? <Button variant='warning' onClick={ () => aliasOperation('deactivate', alias.uuid) }>Deactivate</Button> : null }{' '}
               { alias.active && !alias.ignore ? <Button variant='secondary' onClick={ () => aliasOperation('ignore', alias.uuid) }>Ignore</Button> : null }{' '}
