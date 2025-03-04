@@ -8,6 +8,7 @@ import { useState, useEffect } from 'react';
 import { DomainDropdown } from './components/tacomail-components';
 import { RandomizerButton } from './components/inputRandomizer';
 import { BuildEmailAccordion, BuildErrorAccordion } from './components/reportAccordion';
+import { DomainConfigDropdown } from './components/tacomail-config';
 
 
 export default function OpenPage() {
@@ -57,7 +58,7 @@ export default function OpenPage() {
   return (
     <div className='w-50 m-auto'>
       <h1 className='text-center'>mikesoh.com mail aliases</h1>
-      <Tabs>
+      <Tabs defaultActiveKey='Config'>
         <Tab eventKey='Search' title='Search'>
           <form onSubmit={sendQuery} className='text-center pb-3'>
             <br/>
@@ -87,6 +88,12 @@ export default function OpenPage() {
                 <Button type='submit'>Create</Button>
               </Col>
             </Row>
+          </form>
+        </Tab>
+        <Tab eventKey='Config' title='Config'>
+          <form onSubmit={sendQuery}>
+            <br/>
+            <DomainConfigDropdown configDomains={tacoMailDomains} />
           </form>
         </Tab>
       </Tabs>
