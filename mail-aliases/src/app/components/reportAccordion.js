@@ -1,5 +1,4 @@
 import { pinoLogger } from '@/serverComponents/pinoLogger';
-import { pinoLogger } from '@/serverComponents/pinoLogger';
 import { useState } from 'react';
 
 import { Button, Accordion, Modal } from 'react-bootstrap';
