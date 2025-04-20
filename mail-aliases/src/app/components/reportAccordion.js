@@ -1,4 +1,5 @@
 import { pinoLogger } from '@/serverComponents/pinoLogger';
+import { pinoLogger } from '@/serverComponents/pinoLogger';
 import { useState } from 'react';
 
 import { Button, Accordion, Modal } from 'react-bootstrap';
@@ -7,6 +8,10 @@ import { GetIcons, GetClipboardIcon } from './tacomail-components';
 
 
 export function BuildEmailAccordion({ emailArray, onResultMutate }) {
+  const initialClipboardState = emailArray.map(alias => {
+    return {'fullEmailAddress': alias.fullEmailAddress, 'clipboard': false};
+  });
+
   const [showEmailEmbiggenModel, setShowEmbiggenEmailModel] = useState(false);
   const [showClipboardToast, setShowClipboardToast] = useState(false);
   const [thisAlias, setThisAlias] = useState('');
