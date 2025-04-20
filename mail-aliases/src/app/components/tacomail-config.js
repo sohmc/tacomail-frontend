@@ -1,61 +1,80 @@
 import { useState } from 'react';
-import { Row, Col } from 'react-bootstrap';
+
+import { Button, Accordion, Modal, AccordionHeader } from 'react-bootstrap';
 import Form from 'react-bootstrap/Form';
 import Table from 'react-bootstrap/Table';
-import Accordion from 'react-bootstrap/Accordion';
 
-export function DomainConfigDropdown({ configDomains }) {
-  const [configDomain, setConfigDomain] = useState();
-  
+export function DomainConfigDropdown({ configDomains }) {  
   if (!Array.isArray(configDomains)) return (null);
-  const activeDomains = configDomains.sort();
+  const subDomains = configDomains.map((i) => i.subdomain);
+  subDomains.sort();
   return (
     <>
-      <Row className='align-items-top'>
-        <Col xs={3}>
-          Domains: 
-        </Col>
-        <Col>    
-          <Form.Select size='sm' name='selectedDomain' onChange={ (e) => setConfigDomain(e.target.value) }>
-            { activeDomains.length > 0 ? (<option value=''>Select a Domain</option>) : null }
-            { activeDomains.length > 0 ? activeDomains.sort().map(element => (<option value={element.subdomain} key={element.subdomain}>{element.subdomain}</option>)) : (<option value='noconfig'>No Configuration Set</option>) }
-            <option value='new' key='new'>Add new domain</option>
-          </Form.Select>
-        </Col>
-      </Row>
-      <p/>
-      { configDomain ? domainConfigDetails(configDomains.find((i) => i.subdomain == configDomain)) : null }
+      <Accordion defaultActiveKey={['0']} alwaysOpen>
+        { configToolbar(subDomains) }
+        { configDomains ? subDomains.map(thisSubdomain => domainConfigDetails(configDomains.find((i) => i.subdomain == thisSubdomain))) : null }
+      </Accordion>
     </>
   );
 }
 
 function domainConfigDetails(selectedDomainObject) {
   return (
-    <Accordion defaultActiveKey="0">
-      <Accordion.Item eventKey="0">
-        <Accordion.Header>{selectedDomainObject.subdomain}</Accordion.Header>
-        <Accordion.Body>
-          <Table hover>
-            <thead>
-              <tr>
-                <th>Description</th>
-                <th>Created</th>
-                <th>Modified</th>
-                <th>Flags</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>{ selectedDomainObject.destination }</td>
-                <td>{ convertEpochToDate(selectedDomainObject.created_datetime) } </td>
-                <td>{ convertEpochToDate(selectedDomainObject.modified_datetime) }</td>
-                <td>{ selectedDomainObject.active ? 'Active' : 'Inactive' }</td>
-              </tr>
-            </tbody>
-            </Table>
-        </Accordion.Body>
-      </Accordion.Item>
-    </Accordion>
+    <Accordion.Item eventKey={selectedDomainObject.subdomain} key={selectedDomainObject.subdomain}>
+      <Accordion.Header>{selectedDomainObject.subdomain}</Accordion.Header>
+      <Accordion.Body>
+        <Table hover>
+          <thead>
+            <tr>
+              <th>Description</th>
+              <th>Created</th>
+              <th>Modified</th>
+              <th>Flags</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>{ selectedDomainObject.description }</td>
+              <td>{ convertEpochToDate(selectedDomainObject.created_datetime) } </td>
+              <td>{ convertEpochToDate(selectedDomainObject.modified_datetime) }</td>
+              <td>{ selectedDomainObject.active ? 'Active' : 'Inactive' }</td>
+            </tr>
+          </tbody>
+        </Table>
+
+        { selectedDomainObject.active ? <Button variant='warning'>Deactivate</Button> : <Button variant='success'>Activate</Button> } {' '}
+      </Accordion.Body>
+    </Accordion.Item>
+  );
+}
+
+function configToolbar(subDomains) {
+  return (
+    <Accordion.Item eventKey="0" key="0">
+      <Accordion.Header>{ subDomains.length == 0 ? "No Config Found" : "tacomail config Toolbar" }</Accordion.Header>
+      <Accordion.Body>
+        <Table hover>
+          <thead>
+            <tr>
+              <th>Domains Configured</th>
+              <th>tacomail version</th>
+              <th>dynamoDB Table Name</th>
+              <th>env</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>{ subDomains.length }</td>
+              <td>v1.2.3</td>
+              <td>someTableName</td>
+              <td>{ JSON.stringify(subDomains) }</td>
+            </tr>
+          </tbody>
+        </Table>
+
+        <Button variant='info'>Add Domain</Button>{' '}
+      </Accordion.Body>
+    </Accordion.Item>
   );
 }
 
