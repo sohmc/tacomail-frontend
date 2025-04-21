@@ -1,17 +1,17 @@
 import { useState } from 'react';
 
-import { Button, Accordion, Modal, AccordionHeader } from 'react-bootstrap';
+import { Button, Accordion } from 'react-bootstrap';
 import Form from 'react-bootstrap/Form';
 import Table from 'react-bootstrap/Table';
 
-export function DomainConfigDropdown({ configDomains }) {  
+export function DomainConfigAccordion({ configDomains, configModal }) {
   if (!Array.isArray(configDomains)) return (null);
   const subDomains = configDomains.map((i) => i.subdomain);
   subDomains.sort();
   return (
     <>
       <Accordion defaultActiveKey={['0']} alwaysOpen>
-        { configToolbar(subDomains) }
+        { configToolbar(subDomains, configModal) }
         { configDomains ? subDomains.map(thisSubdomain => domainConfigDetails(configDomains.find((i) => i.subdomain == thisSubdomain))) : null }
       </Accordion>
     </>
@@ -48,7 +48,8 @@ function domainConfigDetails(selectedDomainObject) {
   );
 }
 
-function configToolbar(subDomains) {
+function configToolbar(subDomains, configModal) {
+  const setConfigModal = (setToValue) => { configModal(setToValue); }
   return (
     <Accordion.Item eventKey="0" key="0">
       <Accordion.Header>{ subDomains.length == 0 ? "No Config Found" : "tacomail config Toolbar" }</Accordion.Header>
@@ -67,12 +68,12 @@ function configToolbar(subDomains) {
               <td>{ subDomains.length }</td>
               <td>v1.2.3</td>
               <td>someTableName</td>
-              <td>{ JSON.stringify(subDomains) }</td>
+              <td>someEnvs</td>
             </tr>
           </tbody>
         </Table>
 
-        <Button variant='info'>Add Domain</Button>{' '}
+        <Button variant='info' onClick={ () => setConfigModal(true)}>Add Domain</Button>
       </Accordion.Body>
     </Accordion.Item>
   );

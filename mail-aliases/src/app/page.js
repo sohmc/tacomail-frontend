@@ -2,22 +2,24 @@
 import { pinoLogger } from '@/serverComponents/pinoLogger';
 
 import 'bootstrap/dist/css/bootstrap.min.css';
-import { Col, Row, Tabs, Tab, Button, InputGroup, Form } from 'react-bootstrap';
+import { Col, Row, Tabs, Tab, Button, InputGroup, Form, Modal } from 'react-bootstrap';
 import { useState, useEffect } from 'react';
 
 import { DomainDropdown } from './components/tacomail-components';
 import { RandomizerButton } from './components/inputRandomizer';
 import { BuildEmailAccordion, BuildErrorAccordion } from './components/reportAccordion';
-import { DomainConfigDropdown } from './components/tacomail-config';
+import { DomainConfigAccordion } from './components/tacomail-config';
 
 
 export default function OpenPage() {
   const [query, _setQuery] = useState('');
   const [error, setError] = useState(null);
   const [results, setResults] = useState(null);
+  const [showConfigModal, setShowConfigModal] = useState(true);
 
   const [tacoMailDomains, setTacoMailDomains] = useState({});
 
+  const closeConfigModal = () => setShowConfigModal(false);
   useEffect(() => {
     async function getConfig() {
       const fetchResults = await fetch('api/config', { method: 'POST' });
@@ -91,10 +93,22 @@ export default function OpenPage() {
           </form>
         </Tab>
         <Tab eventKey='Config' title='Config'>
-          <form onSubmit={sendQuery}>
-            <br/>
-            <DomainConfigDropdown configDomains={tacoMailDomains} />
-          </form>
+            <DomainConfigAccordion configDomains={tacoMailDomains} configModal={setShowConfigModal} />
+            <Modal show={ showConfigModal } onHide={ closeConfigModal }>
+              <Modal.Header closeButton />
+              <Modal.Body>
+                <form onSubmit={sendQuery}>
+                  <Row className='align-items-top'>
+                    <Col xs={10}>
+                      <Form.Control type="text" name='search' defaultValue={query}/>
+                    </Col>
+                    <Col>
+                      <Button type='submit'>Add Domain</Button>
+                    </Col>
+                  </Row>
+                </form>
+              </Modal.Body>
+            </Modal>
         </Tab>
       </Tabs>
       { results ? <BuildEmailAccordion emailArray={results} onResultMutate={setResults} /> : <BuildErrorAccordion errorObject={error} />}
