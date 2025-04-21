@@ -30,10 +30,13 @@ export function GetIcons({ ignoreFlag, activeFlag, newFlag }) {
 export function DomainDropdown({ configDomains }) {
   if (!Array.isArray(configDomains) || configDomains.length == 0) return (null);
   const activeDomains = configDomains.filter(domain => domain.active);
+  const subDomains = configDomains.map(i => i.subdomain);
+  subDomains.sort();
+
   return (
     <Form.Select size='sm' name='selectedDomain' required>
       { activeDomains.length > 0 ? (<option value=''>Select a Domain</option>) : null }
-      { activeDomains.length > 0 ? activeDomains.sort().map(element => (<option value={element.subdomain} key={element.subdomain}>{element.subdomain}</option>)) : (<option value='noconfig'>No Configuration Set</option>)}
+      { activeDomains.length > 0 ? subDomains.map(i => (<option value={i} key={i}>{i}</option>)) : (<option value='noconfig'>No Configuration Set</option>) }
     </Form.Select>
   );
 }

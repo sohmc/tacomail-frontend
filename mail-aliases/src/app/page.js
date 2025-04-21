@@ -94,12 +94,12 @@ export default function OpenPage() {
         </Tab>
         <Tab eventKey='Config' title='Config'>
             <DomainConfigAccordion configDomains={tacoMailDomains} configModal={setShowConfigModal} />
-            <Modal show={ showConfigModal } onHide={ closeConfigModal }>
-              <Modal.Header closeButton />
-              <Modal.Body>
+            <Modal show={ showConfigModal } onHide={ closeConfigModal } size='lg'>
+              <Modal.Header closeButton>Add Domain</Modal.Header>
+              <Modal.Body className='text-center'>
                 <form onSubmit={sendQuery}>
                   <Row className='align-items-top'>
-                    <Col xs={10}>
+                    <Col xs={9}>
                       <Form.Control type="text" name='search' defaultValue={query}/>
                     </Col>
                     <Col>

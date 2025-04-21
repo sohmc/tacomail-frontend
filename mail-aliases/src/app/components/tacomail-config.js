@@ -49,7 +49,6 @@ function domainConfigDetails(selectedDomainObject) {
 }
 
 function configToolbar(subDomains, configModal) {
-  const setConfigModal = (setToValue) => { configModal(setToValue); }
   return (
     <Accordion.Item eventKey="0" key="0">
       <Accordion.Header>{ subDomains.length == 0 ? "No Config Found" : "tacomail config Toolbar" }</Accordion.Header>
@@ -73,7 +72,7 @@ function configToolbar(subDomains, configModal) {
           </tbody>
         </Table>
 
-        <Button variant='info' onClick={ () => setConfigModal(true)}>Add Domain</Button>
+        <Button variant='info' onClick={ () => configModal(true)}>Add Domain</Button>
       </Accordion.Body>
     </Accordion.Item>
   );
