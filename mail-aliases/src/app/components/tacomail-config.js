@@ -62,7 +62,7 @@ function configToolbar(subDomains, configModal) {
           <tbody>
             <tr>
               <td>{ subDomains.length }</td>
-              <td>{ npmVersion }</td>
+              <td>v-Some Version</td>
               <td>someTableName</td>
               <td>someEnvs</td>
             </tr>
