@@ -15,7 +15,7 @@
     "@aws-crypto/sha256-js": "^5.2.0",
     "@smithy/signature-v4": "^5.0.1",
     "bootstrap": "^5.3.3",
-    "next": "^14.2.24",
+    "next": "^15.3.1",
     "pino": "^8.21.0",
     "react": "^18.3.1",
     "react-bootstrap": "^2.10.9",
