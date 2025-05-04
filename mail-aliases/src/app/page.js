@@ -40,8 +40,9 @@ export default function OpenPage() {
 
     pinoLogger.info('(page.sendQuery) formJson: ' + JSON.stringify(formJson));
 
-    if (((Object.prototype.hasOwnProperty.call(formJson, 'search') && formJson.search.length > 0)
-        || ((Object.prototype.hasOwnProperty.call(formJson, 'create') && formJson.create.length > 0)))) {
+    if ((Object.hasOwn(formJson, 'search') && formJson.search.length > 0)
+        || (Object.hasOwn(formJson, 'create') && formJson.create.length > 0)
+        || (Object.hasOwn(formJson, 'domain') && formJson.domain.length > 0)) {
       const apiRequest = {
         method: 'POST',
         body: formData,
@@ -50,7 +51,7 @@ export default function OpenPage() {
       const fetchResults = await fetch('api', apiRequest);
 
       const fetchResultsJson = await fetchResults.json();
-      if (Object.prototype.hasOwnProperty.call(fetchResultsJson, 'message') || Object.prototype.hasOwnProperty.call(fetchResultsJson, 'error'))
+      if (Object.hasOwn(fetchResultsJson, 'message') || Object.hasOwn(fetchResultsJson, 'error'))
         setError(fetchResultsJson);
       else
         setResults(fetchResultsJson);
@@ -60,7 +61,7 @@ export default function OpenPage() {
   return (
     <div className='w-50 m-auto'>
       <h1 className='text-center'>mikesoh.com mail aliases</h1>
-      <Tabs defaultActiveKey='Config'>
+      <Tabs defaultActiveKey='Search'>
         <Tab eventKey='Search' title='Search'>
           <form onSubmit={sendQuery} className='text-center pb-3'>
             <br/>
@@ -100,7 +101,7 @@ export default function OpenPage() {
                 <form onSubmit={sendQuery}>
                   <Row className='align-items-top'>
                     <Col xs={9}>
-                      <Form.Control type="text" name='search' defaultValue={query}/>
+                      <Form.Control type="text" name='domain' defaultValue={query}/>
                     </Col>
                     <Col>
                       <Button type='submit'>Add Domain</Button>

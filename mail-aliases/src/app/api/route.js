@@ -37,6 +37,13 @@ export async function POST(request) {
 
     winstonLogger.info('(api/route.POST) request.create -- RETURNING ' + JSON.stringify(returnObject));
     return Response.json(returnObject);
+  } else if (formData.get('domain')) {
+    winstonLogger.info('(api/route.POST) request.domain -- ' + JSON.stringify(formData.get('domain')));
+
+    returnObject = await createDomain(formData.get('domain').toLowerCase().trim());
+
+    winstonLogger.debug('(api/route.POST) request.domain -- RETURNING ' + JSON.stringify(returnObject));
+    return Response.json(returnObject);
   }
 }
 
@@ -75,3 +82,22 @@ async function searchDatabase(searchString) {
   return responseJson;
 }
 
+async function createDomain(subdomain, description = 'null') {
+  const endpoint = '/domain';
+
+  const requestBody = {
+    'domain':  subdomain,
+    'description': description,
+    'active': true,
+  }
+
+  const responseJson = await sendApiRequest('POST', endpoint, requestBody);
+
+  // If we get an 'created' property and the domain is the same as the 
+  // subdomain requested, then return the alias record, and add 'new' 
+  // to the object.
+  if (Object.hasOwn(responseJson, 'created') && responseJson.domain === subdomain)
+    return { ...responseJson, 'new': true };
+  else 
+    return responseJson;
+}
