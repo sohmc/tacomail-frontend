@@ -2,21 +2,24 @@
 import { pinoLogger } from '@/serverComponents/pinoLogger';
 
 import 'bootstrap/dist/css/bootstrap.min.css';
-import { Col, Row, Tabs, Tab, Button, InputGroup, Form } from 'react-bootstrap';
+import { Col, Row, Tabs, Tab, Button, InputGroup, Form, Modal } from 'react-bootstrap';
 import { useState, useEffect } from 'react';
 
 import { DomainDropdown } from './components/tacomail-components';
 import { RandomizerButton } from './components/inputRandomizer';
 import { BuildEmailAccordion, BuildErrorAccordion } from './components/reportAccordion';
+import { DomainConfigAccordion } from './components/tacomail-config';
 
 
 export default function OpenPage() {
   const [query, _setQuery] = useState('');
   const [error, setError] = useState(null);
   const [results, setResults] = useState(null);
+  const [showConfigModal, setShowConfigModal] = useState(true);
 
   const [tacoMailDomains, setTacoMailDomains] = useState({});
 
+  const closeConfigModal = () => setShowConfigModal(false);
   useEffect(() => {
     async function getConfig() {
       const fetchResults = await fetch('api/config', { method: 'POST' });
@@ -37,8 +40,9 @@ export default function OpenPage() {
 
     pinoLogger.info('(page.sendQuery) formJson: ' + JSON.stringify(formJson));
 
-    if (((Object.prototype.hasOwnProperty.call(formJson, 'search') && formJson.search.length > 0)
-        || ((Object.prototype.hasOwnProperty.call(formJson, 'create') && formJson.create.length > 0)))) {
+    if ((Object.hasOwn(formJson, 'search') && formJson.search.length > 0)
+        || (Object.hasOwn(formJson, 'create') && formJson.create.length > 0)
+        || (Object.hasOwn(formJson, 'domain') && formJson.domain.length > 0)) {
       const apiRequest = {
         method: 'POST',
         body: formData,
@@ -47,7 +51,7 @@ export default function OpenPage() {
       const fetchResults = await fetch('api', apiRequest);
 
       const fetchResultsJson = await fetchResults.json();
-      if (Object.prototype.hasOwnProperty.call(fetchResultsJson, 'message') || Object.prototype.hasOwnProperty.call(fetchResultsJson, 'error'))
+      if (Object.hasOwn(fetchResultsJson, 'message') || Object.hasOwn(fetchResultsJson, 'error'))
         setError(fetchResultsJson);
       else
         setResults(fetchResultsJson);
@@ -57,7 +61,7 @@ export default function OpenPage() {
   return (
     <div className='w-50 m-auto'>
       <h1 className='text-center'>mikesoh.com mail aliases</h1>
-      <Tabs>
+      <Tabs defaultActiveKey='Search'>
         <Tab eventKey='Search' title='Search'>
           <form onSubmit={sendQuery} className='text-center pb-3'>
             <br/>
@@ -88,6 +92,24 @@ export default function OpenPage() {
               </Col>
             </Row>
           </form>
+        </Tab>
+        <Tab eventKey='Config' title='Config'>
+            <DomainConfigAccordion configDomains={tacoMailDomains} configModal={setShowConfigModal} />
+            <Modal show={ showConfigModal } onHide={ closeConfigModal } size='lg'>
+              <Modal.Header closeButton>Add Domain</Modal.Header>
+              <Modal.Body className='text-center'>
+                <form onSubmit={sendQuery}>
+                  <Row className='align-items-top'>
+                    <Col xs={9}>
+                      <Form.Control type="text" name='domain' defaultValue={query}/>
+                    </Col>
+                    <Col>
+                      <Button type='submit'>Add Domain</Button>
+                    </Col>
+                  </Row>
+                </form>
+              </Modal.Body>
+            </Modal>
         </Tab>
       </Tabs>
       { results ? <BuildEmailAccordion emailArray={results} onResultMutate={setResults} /> : <BuildErrorAccordion errorObject={error} />}
