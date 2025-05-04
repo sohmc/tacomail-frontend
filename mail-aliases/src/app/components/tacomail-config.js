@@ -1,7 +1,4 @@
-import { useState } from 'react';
-
 import { Button, Accordion } from 'react-bootstrap';
-import Form from 'react-bootstrap/Form';
 import Table from 'react-bootstrap/Table';
 
 export function DomainConfigAccordion({ configDomains, configModal }) {
@@ -65,7 +62,7 @@ function configToolbar(subDomains, configModal) {
           <tbody>
             <tr>
               <td>{ subDomains.length }</td>
-              <td>v1.2.3</td>
+              <td>{ npmVersion }</td>
               <td>someTableName</td>
               <td>someEnvs</td>
             </tr>
