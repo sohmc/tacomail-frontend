@@ -15,7 +15,7 @@ export default function OpenPage() {
   const [query, _setQuery] = useState('');
   const [error, setError] = useState(null);
   const [results, setResults] = useState(null);
-  const [showConfigModal, setShowConfigModal] = useState(true);
+  const [showConfigModal, setShowConfigModal] = useState(false);
 
   const [tacoMailDomains, setTacoMailDomains] = useState({});
 
