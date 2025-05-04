@@ -19,7 +19,7 @@ RUN \
 # Next.js collects completely anonymous telemetry data about general usage.
 # Learn more here: https://nextjs.org/telemetry
 # Uncomment the following line in case you want to disable telemetry during the build.
-ENV NEXT_TELEMETRY_DISABLED 1
+ENV NEXT_TELEMETRY_DISABLED=1
 
 # Run the build script
 RUN \
@@ -28,10 +28,7 @@ RUN \
   else echo "Lockfile not found." && exit 1; \
   fi
 
-ENV NODE_ENV production
-
-# Disable nextjs telemetry
-ENV NEXT_TELEMETRY_DISABLED 1
+ENV NODE_ENV=production
 
 # Create non-root user
 RUN addgroup --system --gid 1001 nodejs
@@ -45,9 +42,9 @@ USER nextjs
 
 EXPOSE 3000
 
-ENV PORT 3000
+ENV PORT=3000
 # set hostname to localhost
-ENV HOSTNAME "0.0.0.0"
+ENV HOSTNAME="0.0.0.0"
 
 # Run the server
 CMD ["npm", "run", "start"]
