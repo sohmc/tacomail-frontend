@@ -24,7 +24,7 @@ jobs:
       
       - name: Git Version
         id: version
-        uses: codacy/git-version@2.8.0
+        uses: codacy/git-version@2.8.1
       
       - name: Append git commit-sha to package.json
         run: |
